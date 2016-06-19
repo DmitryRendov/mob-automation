@@ -1,0 +1,10 @@
+# setup ftp (vsftpd)
+# ansible-playbook -i ./inventory/dev ftp.yml --extra-vars "env=mob" -vv
+
+- hosts: "{{env}}"
+  user: vagrant
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  roles:
+    - ftp
