@@ -1,0 +1,24 @@
+---
+# Install ftp
+
+- name: Install ftp
+  apt: pkg={{item}} state=present update_cache=yes force=yes
+  with_items:
+    - vsftpd
+
+- name: Add hidden files
+  lineinfile:
+    dest: /etc/vsftpd.conf
+    regexp: '^#write_enable'
+    line: 'write_enable=YES'
+    backrefs: yes
+    state: present
+
+- name: Enable display of hidden dot files
+  lineinfile:
+    dest: /etc/vsftpd.conf
+    line: 'force_dot_files=YES'
+    state: present
+
+- name: Restart ftp service
+  service: name=vsftpd state=restarted
