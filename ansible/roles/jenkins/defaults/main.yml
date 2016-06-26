@@ -20,13 +20,13 @@ jenkins_ssh_fingerprints:
   - "github.com,204.232.175.90 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=="
 
 # Private keys for Jenkins deployments
-jenkins_ssh_key_files: [id_rsa_authmereloaded.pem,id_rsa_bungecoord.pem,id_rsa_mobdeploy.pem,id_rsa_mobadmin.pem]
+jenkins_ssh_key_files: [id_rsa_authmereloaded.pem,id_rsa_bungecoord.pem,id_rsa_mobdeploy.pem,id_rsa_mobadmin.pem,id_rsa_mob-scm.pem]
 
 # Ensure the packages installed
 jenkins_apt_packages: [git,subversion,maven,ruby,ruby-sass]
 
 # Ensure the plugins is installed
-jenkins_plugins: [artifactory,artifactdeployer,artifact-promotion,backup,config-file-provider,copyartifact,deploy,dynamicparameter,git,git-parameter,git-server,m2release,mailer,maven-plugin,parameterized-trigger,scp,scriptler,ssh,ssh-slaves,token-macro,translation,timestamper,uno-choice]
+jenkins_plugins: [artifactory,artifactdeployer,artifact-promotion,backup,config-file-provider,copyartifact,deploy,dynamicparameter,git,git-parameter,git-server,github-api,github,m2release,mailer,maven-plugin,parameterized-trigger,scp,scriptler,ssh,ssh-slaves,ssh-agent,token-macro,translation,timestamper,uno-choice,scm-sync-configuration,multiple-scms,startup-trigger-plugin,saferestart,jobConfigHistory,timestamper,jqs-monitoring,metrics,metrics-diskusage,show-build-parameters]
 
 jenkins_java: /usr/bin/java
 jenkins_java_args:
