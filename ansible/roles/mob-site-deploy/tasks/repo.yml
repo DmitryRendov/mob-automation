@@ -16,9 +16,6 @@
   set_fact: site_path="{{ vhosts }}/{{env_type}}.{{ site_name }}"
   when: env_type == "staging"
 
-- debug: var=site_path
-- pause: prompt="Some pause"
-
 - name: Create project folders if not exists
   file: path="{{site_path}}/{{ item.name }}" state=directory mode={{ item.mode }} owner={{ user }} group={{ group }}
   with_items:
@@ -29,13 +26,8 @@
                host='github.com'
                key="{{ lookup('file', 'github.com.pub') }}"
  
-- name: Checkout servers repo
+- name: Checkout site repo
   become: yes
   become_user: "{{ user }}"
   become_method: sudo
   git: repo={{ site_repo }} dest={{ site_path }}/public_html force=yes
-
-#- name: Setup site configuration
-#  template: src={{ item.tmpl }} dest={{ item.dst }} owner={{ user }} group={{ group }} mode=0644
-#  with_items:
-#    - { tmpl: "./lobby/site.properties.j2", dst: "{{ site_folder }}/lobby/server.properties" }
