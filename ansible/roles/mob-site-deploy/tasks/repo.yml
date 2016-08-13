@@ -1,0 +1,41 @@
+---
+
+- name: Check if a user has added to sudores and validate it before saving
+  lineinfile: dest=/etc/sudoers state=present regexp='^{{ user }} ALL\=' line='{{ user }} ALL=(ALL) NOPASSWD:ALL' validate='visudo -cf %s'
+
+- name: Pre-configure git
+  template: src=config.j2 dest={{ home }}/.ssh/config owner={{ user }} group={{ group }} mode=0644
+
+- name: Pre-configure git
+  template: src=gitconfig.j2 dest={{ home }}/.gitconfig owner={{ user }} group={{ group }} mode=0644
+
+- name: Place the deployment key into ~/.ssh folder
+  copy: src=id_rsa_mobsitedeploy.pem dest={{ home }}/.ssh/id_rsa_mobsitedeploy.pem owner={{ user }} group={{ group }} mode=0400
+
+- name: Adding staging prefix for dev/staging env
+  set_fact: site_path="{{ vhosts }}/{{env_type}}.{{ site_name }}"
+  when: env_type == "staging"
+
+- debug: var=site_path
+- pause: prompt="Some pause"
+
+- name: Create project folders if not exists
+  file: path="{{site_path}}/{{ item.name }}" state=directory mode={{ item.mode }} owner={{ user }} group={{ group }}
+  with_items:
+    - "{{ site_folders }}"
+
+- name: Tell the host about our servers it might want to ssh to
+  known_hosts: path='/etc/ssh/ssh_known_hosts'
+               host='github.com'
+               key="{{ lookup('file', 'github.com.pub') }}"
+ 
+- name: Checkout servers repo
+  become: yes
+  become_user: "{{ user }}"
+  become_method: sudo
+  git: repo={{ site_repo }} dest={{ site_path }}/public_html force=yes
+
+#- name: Setup site configuration
+#  template: src={{ item.tmpl }} dest={{ item.dst }} owner={{ user }} group={{ group }} mode=0644
+#  with_items:
+#    - { tmpl: "./lobby/site.properties.j2", dst: "{{ site_folder }}/lobby/server.properties" }

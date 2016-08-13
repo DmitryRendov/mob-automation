@@ -1,0 +1,26 @@
+################################################
+##          Provision Variables               ##
+################################################
+
+# Common variables
+user: "dmitry"
+group: "dmitry"
+home: "/home/dmitry"
+vhosts: "/home/dmitry/vhosts"
+site_name: "minecraft.of.by"
+site_path: "{{ vhosts }}/{{site_name}}"
+site_folders:
+  - { name: "public_html", mode: "755" }
+  - { name: "logs", mode: "755" }
+  - { name: "backups", mode: "755" }
+  - { name: "tmp", mode: "777" }
+site_repo: "git@github.com:DmitryRendov/mob-site.git"
+
+mysql_max_allowed_packet: "32MB"
+mysql_rootpass: "111"
+db_name: django
+db_users:
+  - name: django
+    host: localhost
+    pass: 111
+    priv: "*.*:ALL"

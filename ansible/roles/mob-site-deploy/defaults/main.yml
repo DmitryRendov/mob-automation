@@ -1,0 +1,2 @@
+env_type: "staging"
+dl_target_path: /tmp
