@@ -1,0 +1,18 @@
+---
+
+- name: Check if Sublime 3 is already installed
+  command: dpkg-query -W sublime-text
+  register: is_sublime_installed
+  failed_when: is_sublime_installed.rc > 1
+  changed_when: is_sublime_installed.rc == 1
+
+- name: Downloading Sublime 3
+  get_url:
+    url="{{ sublime_src }}"
+    dest="{{ target_path }}"
+  register: sublime
+  when: is_sublime_installed.rc == 1
+
+- name: Installing Sublime 3
+  apt: deb="{{ sublime.dest }}"
+  when: is_sublime_installed.rc == 1
