@@ -1,0 +1,17 @@
+# Provision a developer desktop machine
+#
+# ansible-playbook -i ./inventory/dev desktop-provision.yml --extra-vars "env=desktop" -vv
+
+- hosts: "{{env}}"
+  user: vagrant
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  max_fail_percentage: 0
+
+  roles:
+    - common
+    - java1.8-oracle-debian
+    - ftp
+    - mysql
+    - desktop-provision
