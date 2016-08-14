@@ -12,16 +12,15 @@
         # Identical to combined format, except that we swap remote-host (%h) with X-Forwared-For
         LogFormat "%{X-Forwaded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\""
 
-        CustomLog "|/usr/bin/cronolog -l {{ vhosts }}/{{ site_name }}/logs/access.log {{ vhosts }}/{{ site_name }}/logs/access.%Y-%m-%d.log" vhost_combined
-        ErrorLog  "|/usr/bin/cronolog -l {{ vhosts }}/{{ site_name }}/logs/error.log {{ vhosts }}/{{ site_name }}/logs/error.%Y-%m-%d.log"
-        CustomLog "|/usr/bin/cronolog -l {{ vhosts }}/{{ site_name }}/logs/latency.log {{ vhosts }}/{{ site_name }}/logs/latency.%Y-%m-%d.log" "%D %r"
+        CustomLog "|$/usr/bin/cronolog -l {{ vhosts }}/{{ site_name }}/logs/access.log {{ vhosts }}/{{ site_name }}/logs/access.%Y-%m-%d.log" vhost_combined
+        ErrorLog  "|$/usr/bin/cronolog -l {{ vhosts }}/{{ site_name }}/logs/error.log {{ vhosts }}/{{ site_name }}/logs/error.%Y-%m-%d.log"
+        CustomLog "|$/usr/bin/cronolog -l {{ vhosts }}/{{ site_name }}/logs/latency.log {{ vhosts }}/{{ site_name }}/logs/latency.%Y-%m-%d.log" "%D %r"
 
         ErrorDocument 500 /static/500.html
         ErrorDocument 503 /static/maintenance.html
 
         RewriteEngine on
-        #RewriteLog /var/log/apache2/rewrite.log
-        #RewriteLogLevel 4
+        LogLevel warn rewrite:trace4
 
         RequestHeader set HTTP_HOST {{ site_name }}
 

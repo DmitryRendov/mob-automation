@@ -6,6 +6,6 @@ apache2_modules:
   - { name: headers, state: present }
   - { name: rewrite, state: present }
   - { name: expires, state: present }
-  - { name: uwsgi, state: present }
+  - { name: wsgi, state: present }
 
 http_port: 80
