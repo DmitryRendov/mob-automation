@@ -18,7 +18,7 @@ site_repo: "git@github.com:DmitryRendov/mob-site.git"
 
 mysql_max_allowed_packet: "32MB"
 mysql_rootpass: "111"
-db_name: django
+db_name: django_cms
 db_users:
   - name: django
     host: localhost

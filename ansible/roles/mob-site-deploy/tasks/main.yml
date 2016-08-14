@@ -4,6 +4,8 @@
 
 - include: repo.yml
 
+- include: configure.yml
+
 - include: database.yml
 
 - include: services.yml

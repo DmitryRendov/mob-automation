@@ -4,3 +4,23 @@
   apt: pkg={{item}} state=present
   with_items:
     - git
+    - build-essential
+    - python-setuptools
+    - python-dev
+    - python-pip
+    - python-virtualenv
+    - libevent-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - python-mysqldb
+    - libmysqlclient-dev
+    - libjpeg62-turbo
+    - zlib1g
+    - libfreetype6
+    - libjpeg62-turbo-dev
+    - libopenjpeg-dev
+    - libfreetype6-dev
+    - libtiff5-dev
+    - liblcms2-dev
+    - libwebp-dev
+    - tk8.6-dev

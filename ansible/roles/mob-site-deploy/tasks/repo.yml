@@ -14,7 +14,7 @@
 
 - name: Adding staging prefix for dev/staging env
   set_fact: site_path="{{ vhosts }}/{{env_type}}.{{ site_name }}"
-  when: env_type == "staging"
+  when: env_type is defined and env_type == "dev"
 
 - name: Create project folders if not exists
   file: path="{{site_path}}/{{ item.name }}" state=directory mode={{ item.mode }} owner={{ user }} group={{ group }}
@@ -25,9 +25,22 @@
   known_hosts: path='/etc/ssh/ssh_known_hosts'
                host='github.com'
                key="{{ lookup('file', 'github.com.pub') }}"
- 
+
 - name: Checkout site repo
   become: yes
   become_user: "{{ user }}"
   become_method: sudo
   git: repo={{ site_repo }} dest={{ site_path }}/public_html force=yes
+
+- name: Install specified python requirements in indicated (virtualenv), step 1
+  become: yes
+  become_user: "{{ user }}"
+  become_method: sudo
+  pip: requirements="{{ site_path }}/public_html/requirements/production.txt" virtualenv="{{ site_path }}/public_html/python-bin"
+
+- name: Install dev dependencies, step 2
+  become: yes
+  become_user: "{{ user }}"
+  become_method: sudo
+  pip: requirements="{{ site_path }}/public_html/requirements/development.txt" virtualenv="{{ site_path }}/public_html/python-bin"
+  when: env_type is defined and env_type == "dev"

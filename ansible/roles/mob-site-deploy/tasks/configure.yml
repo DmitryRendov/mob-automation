@@ -1,0 +1,16 @@
+---
+# Configure virtualhost
+
+- name: Adding staging prefix for dev/staging env
+  set_fact: site_name="{{env_type}}.{{ site_name }}"
+  when: env_type is defined and env_type == "dev"
+
+- name: Creating virtual host file
+  template: src=minecraft-of-by.conf.j2 dest=/etc/apache2/sites-available/{{ site_name }}.conf
+
+- name: a2ensite {{ site_name }}
+  command: a2ensite {{ site_name }}
+  args:
+    creates: /etc/apache2/sites-enabled/{{ site_name }}.conf
+  notify:
+    - restart apache2
