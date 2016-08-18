@@ -1,2 +1,6 @@
+---
 target_path: /tmp
 sublime_src: "https://download.sublimetext.com/sublime-text_build-3114_amd64.deb"
+
+# nodejs version ("4.x", "5.x", "6.x") from https://github.com/nodesource/distributions
+nodejs_version: "6.x"
