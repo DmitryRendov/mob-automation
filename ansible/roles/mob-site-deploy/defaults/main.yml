@@ -1,4 +1,4 @@
-dl_target_path: /tmp
+target_path: /tmp
 site_folders:
   - { name: "public_html", mode: "775", user: "dmitry", group: "www-data" }
   - { name: "logs", mode: "775", user: "root", group: "adm" }

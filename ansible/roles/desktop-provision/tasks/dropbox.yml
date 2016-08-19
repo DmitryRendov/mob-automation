@@ -1,0 +1,25 @@
+---
+
+- name: Setting up pre-requirements
+  apt: name={{ item }} state=present
+  with_items:
+    - python-gtk2
+    - python-gpgme
+    - libpango1.0-0
+
+- name: Check if Dropbox is already installed
+  command: dpkg-query -W dropbox
+  register: is_dropbox_installed
+  failed_when: is_dropbox_installed.rc > 1
+  changed_when: is_dropbox_installed.rc == 1
+
+- name: Downloading Dropbox
+  get_url:
+    url="{{ dropbox_src }}"
+    dest="{{ target_path }}"
+  register: dropbox
+  when: is_dropbox_installed.rc == 1
+
+- name: Installing Dropbox
+  apt: deb="{{ dropbox.dest }}"
+  when: is_dropbox_installed.rc == 1

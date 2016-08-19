@@ -5,3 +5,5 @@
 - include: sublime.yml
 
 - include: nodejs.yml
+
+- include: dropbox.yml

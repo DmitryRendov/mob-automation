@@ -11,3 +11,6 @@
 
   roles:
     - mob-site-deploy
+
+  vars_files:
+    - host_vars/mob

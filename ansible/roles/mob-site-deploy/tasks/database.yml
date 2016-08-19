@@ -1,16 +1,19 @@
 ---
 
 - name: Create a database for the site
-  mysql_db: name={{ db_name }} state=present
+  mysql_db: name={{ site_db_name }} state=present
 
 - name: Create the database users
   mysql_user: name={{ item.name }}  password={{ item.pass|default("111") }}
               priv={{ item.priv|default("*.*:ALL") }} state=present host={{ item.host | default("localhost") }}
-  with_items: "{{ db_users }}"
-  when: db_users|lower() != 'none'
+  with_items: "{{ site_db_users }}"
+  when: site_db_users|lower() != 'none'
 
-#- name: Copy a database dump file to remote host
-#  copy: src={{ db_dump }} dest=/tmp
+- name: Downloading MOB-site latest MySQL dump from Dropbox
+  get_url:
+    url="{{ site_dump_src }}"
+    dest="{{ target_path }}"
+  register: mysql_dump
 
-#- name: Restore it to the server database
-#  mysql_db: name={{ db_name }} state=import target=/tmp/{{ db_dump }}
+- name: Restore it to the site database
+  mysql_db: name={{ site_db_name }} state=import target={{ mysql_dump.dest }}
