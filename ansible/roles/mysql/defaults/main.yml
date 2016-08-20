@@ -5,5 +5,8 @@ mysql_max_allowed_packet: "16MB"
 mysql_rootpass: Secret123
 mysql_port: 3306
 
+# Select what type are we going to use: MyISAM or InnoDB
+mysql_engine: "MyISAM"
+
 mysql_db: none
 mysql_users: none
