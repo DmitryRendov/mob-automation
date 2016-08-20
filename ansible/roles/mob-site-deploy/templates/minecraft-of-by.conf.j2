@@ -46,6 +46,10 @@
             FileETag Size
         </LocationMatch>
 
+        <Location />
+            Require all granted
+        </Location>
+
         # Force browsers to not cache non-static stuff client-side
         Header merge Cache-Control no-store
 

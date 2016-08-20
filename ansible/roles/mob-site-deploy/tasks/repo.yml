@@ -30,7 +30,7 @@
   become: yes
   become_user: "{{ user }}"
   become_method: sudo
-  git: repo={{ site_repo }} dest={{ site_path }}/public_html force=yes
+  git: repo={{ site_repo }} dest={{ site_path }}/public_html version=stable force=yes
 
 - name: Update publiv_html files owner
   command: find {{ site_path }}/public_html -exec chown {{ user }}:www-data {} \;
