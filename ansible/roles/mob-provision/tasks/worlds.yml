@@ -6,7 +6,7 @@
 - name: Download Lobby server source from Dropbox
   become: yes
   become_user: "{{ minecraft_user }}"
-  get_url: url={{ dl_lobby_source_url }} dest={{ dl_target_path }} mode=0644
+  get_url: url={{ server_lobby_src }} dest={{ dl_target_path }} mode=0644
   register: sourcedl_lobby
 
 - name: Unpack Lobby server source
@@ -26,7 +26,7 @@
 - name: Download Survial server source from Dropbox
   become: yes
   become_user: "{{ minecraft_user }}"
-  get_url: url={{ dl_survival_source_url }} dest={{ dl_target_path }} mode=0644 timeout=600
+  get_url: url={{ server_survival_src }} dest={{ dl_target_path }} mode=0644 timeout=600
   register: sourcedl_survival
 
 - name: Unpack Survival server source
@@ -42,7 +42,7 @@
 - name: Download Vanilla server source from Dropbox
   become: yes
   become_user: "{{ minecraft_user }}"
-  get_url: url={{ dl_vanilla_source_url }} dest={{ dl_target_path }} mode=0644 timeout=600
+  get_url: url={{ server_vanilla_src }} dest={{ dl_target_path }} mode=0644 timeout=600
   register: sourcedl_vanilla
 
 - name: Unpack Vanilla server source

@@ -1,0 +1,29 @@
+---
+
+- name: Install grunt and bower globally
+  npm: name={{ item }} global=yes
+  with_items:
+    - bower
+    - grunt-cli
+
+- name: Downloading sources
+  become: yes
+  become_user: "{{ user }}"
+  become_method: sudo
+  command: bower update
+  args:
+    chdir: "{{ site_path }}/public_html/mob/static/"
+
+- name: Install packages based on package.json
+  become: yes
+  become_user: "{{ user }}"
+  become_method: sudo
+  npm: path={{ site_path }}/public_html/mob/static state=present
+
+- name: Launch grunt processing
+  become: yes
+  become_user: "{{ user }}"
+  become_method: sudo
+  command: grunt
+  args:
+    chdir: "{{ site_path }}/public_html/mob/static/"

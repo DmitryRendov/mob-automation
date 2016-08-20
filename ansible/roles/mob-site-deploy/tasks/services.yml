@@ -1,0 +1,5 @@
+---
+
+- shell: echo "Restarting apache2"
+  notify:
+    - restart apache2

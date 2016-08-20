@@ -1,0 +1,13 @@
+# Set up and configure Apache2 to server
+#
+# ansible-playbook -i ./inventory/dev apache2.yml --extra-vars "env=desktop env_type=dev" -vv
+
+- hosts: "{{env}}"
+  user: vagrant
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  max_fail_percentage: 0
+
+  roles:
+    - apache2

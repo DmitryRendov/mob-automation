@@ -1,0 +1,7 @@
+target_path: /tmp
+site_folders:
+  - { name: "public_html", mode: "775", user: "dmitry", group: "www-data" }
+  - { name: "logs", mode: "775", user: "root", group: "adm" }
+  - { name: "backups", mode: "775", user: "dmitry", group: "dmitry" }
+  - { name: "tmp", mode: "777", user: "dmitry", group: "dmitry" }
+

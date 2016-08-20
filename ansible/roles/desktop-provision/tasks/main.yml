@@ -4,4 +4,6 @@
 
 - include: sublime.yml
 
-- include: services.yml
+- include: nodejs.yml
+
+- include: dropbox.yml

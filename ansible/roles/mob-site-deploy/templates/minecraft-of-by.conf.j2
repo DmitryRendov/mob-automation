@@ -1,0 +1,60 @@
+<VirtualHost *:80>
+        ServerName {{ site_name }}
+        ServerAlias www.{{ site_name }}
+
+        UseCanonicalName On
+
+        TimeOut 30
+        # Identical to combined format, except that we swap remote-host (%h) with X-Forwarded-For
+        SetEnvIf REMOTE_ADDR "(.+)" CLIENTIP=$1
+        SetEnvIf X-Forwarded-For "^([0-9.]+)" CLIENTIP=$1
+
+        # Identical to combined format, except that we swap remote-host (%h) with X-Forwared-For
+        LogFormat "%{X-Forwaded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\""
+
+        CustomLog "|$/usr/bin/cronolog -l {{ vhosts }}/{{ site_name }}/logs/access.log {{ vhosts }}/{{ site_name }}/logs/access.%Y-%m-%d.log" vhost_combined
+        ErrorLog  "|$/usr/bin/cronolog -l {{ vhosts }}/{{ site_name }}/logs/error.log {{ vhosts }}/{{ site_name }}/logs/error.%Y-%m-%d.log"
+        CustomLog "|$/usr/bin/cronolog -l {{ vhosts }}/{{ site_name }}/logs/latency.log {{ vhosts }}/{{ site_name }}/logs/latency.%Y-%m-%d.log" "%D %r"
+
+        ErrorDocument 500 /static/500.html
+        ErrorDocument 503 /static/maintenance.html
+
+        RewriteEngine on
+        LogLevel warn rewrite:trace4
+
+        RequestHeader set HTTP_HOST {{ site_name }}
+
+        # RewriteRule /robots.txt {{ vhosts }}/{{ site_name }}/robots.txt [L]
+        # RewriteRule /sitemap(.*) {{ vhosts }}/{{ site_name }}/sitemap$1 [L]
+
+        # serve static files using the /static/ format
+        RewriteCond %{REQUEST_FILENAME} ^/static/(.*)
+        RewriteCond {{ vhosts }}/{{ site_name }}/public_html/mob/static/%1 -f
+        RewriteRule ^/static/(.+)$ {{ vhosts }}/{{ site_name }}/public_html/mob/static/$1 [L]
+
+        # serve media files using the /media/ format
+        RewriteCond %{REQUEST_FILENAME} ^/media/(.*)
+        RewriteCond {{ vhosts }}/{{ site_name }}/public_html/mob/media/%1 -f
+        RewriteRule ^/media/(.+)$ {{ vhosts }}/{{ site_name }}/public_html/mob/media/$1 [L]
+
+        # Force browsers to not cache non-static stuff client-side
+        Header merge Cache-Control no-store
+
+        <LocationMatch "^/static">
+           ExpiresActive On
+            ExpiresDefault "modified plus 1 year"
+            FileETag Size
+        </LocationMatch>
+
+        <Location />
+            Require all granted
+        </Location>
+
+        # Force browsers to not cache non-static stuff client-side
+        Header merge Cache-Control no-store
+
+        WSGIDaemonProcess dmitry user=dmitry threads=2 processes=4 python-path={{ vhosts }}/{{ site_name }}/public_html:{{ vhosts }}/{{ site_name }}/python-bin/lib/python2.7/site-packages receive-buffer-size=87380 send-buffer-size=87380 deadlock-timeout=60 maximum-requests=1000 inactivity-timeout=3600
+        WSGIScriptAlias / {{ vhosts }}/{{ site_name }}/public_html/etc/application.wsgi
+        WSGIProcessGroup dmitry
+        WSGIPassAuthorization On
+</VirtualHost>
