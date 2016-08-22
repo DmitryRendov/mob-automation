@@ -19,6 +19,7 @@
 [client]
 port            = {{ mysql_port }}
 socket          = /var/run/mysqld/mysqld.sock
+character-set-serve = utf8
 
 # Here is entries for some specific programs
 # The following values assume you have at least 32M ram
@@ -41,6 +42,10 @@ basedir         = /usr
 datadir         = /var/lib/mysql
 tmpdir          = /tmp
 lc-messages-dir = /usr/share/mysql
+character-set-serve   = utf8
+collation-server      = utf8_general_ci
+init-connect          = 'SET NAMES utf8'
+character-set-server  = utf8
 skip-external-locking
 #
 # Instead of skip-networking the default is now to listen only on
@@ -118,6 +123,7 @@ max_allowed_packet      = 16M
 
 [mysql]
 #no-auto-rehash # faster start of mysql but no tab completition
+character-set-serve = utf8
 
 [isamchk]
 key_buffer              = 16M
