@@ -1,0 +1,10 @@
+# install getext from source (make)
+# ansible-playbook -i ./inventory/dev gettext.yml --extra-vars "env=desktop" -vv
+
+- hosts: "{{env}}"
+  user: vagrant
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  roles:
+    - gettext
