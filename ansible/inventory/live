@@ -1,0 +1,9 @@
+[local]
+localhost
+
+[mob]
+mob-server    ansible_ssh_host=54.237.212.64 ansible_port=1222 ansible_connection=ssh
+mob-site      ansible_ssh_host=54.237.212.64 ansible_port=1222 ansible_connection=ssh
+
+[demon]
+demon-of-by   ansible_ssh_host=54.237.212.64 ansible_port=1222 ansible_connection=ssh

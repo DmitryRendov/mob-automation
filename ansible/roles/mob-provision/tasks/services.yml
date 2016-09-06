@@ -13,5 +13,5 @@
   with_items:
     - bungeecord
     - lobby
-#    - vanilla
-#    - survival
+    - vanilla
+    - survival

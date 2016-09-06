@@ -1,0 +1,24 @@
+################################################
+##          Provision Variables               ##
+################################################
+
+# Common variables
+
+minecraft_user: minecraft
+minecraft_group: minecraft
+minecraft_home: /home/minecraft
+
+server_folder: /home/minecraft/mob-servers
+server_repo: "git@github.com:DmitryRendov/mob-server.git"
+server_lobby_src: ""
+server_survival_src: ""
+server_vanilla_src: ""
+
+server_dump_src: ""
+server_db_name: mob_server
+server_db_dump: mob_server_latest.dump.gz
+server_db_users:
+  - name: minecraft
+    host: localhost
+    pass: 111
+    priv: "*.*:ALL"

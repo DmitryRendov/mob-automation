@@ -4,6 +4,9 @@
 
 - include: repo.yml
 
+- include: configure.yml
+  when: env_type == "live"
+
 - include: worlds.yml
   when: source == True
 

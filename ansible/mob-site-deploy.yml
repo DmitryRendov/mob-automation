@@ -1,6 +1,6 @@
 # Provision a developer desktop machine
 #
-# ansible-playbook -i ./inventory/dev mob-site-deploy.yml --extra-vars "env=desktop env_type=dev" -vv
+# ansible-playbook -i ./inventory/dev mob-site-deploy.yml --extra-vars "env=mob-site-dev env_type=dev" -vv
 
 - hosts: "{{env}}"
   user: vagrant
@@ -11,6 +11,3 @@
 
   roles:
     - mob-site-deploy
-
-  vars_files:
-    - host_vars/mob
