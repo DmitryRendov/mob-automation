@@ -19,7 +19,6 @@
 [client]
 port            = {{ mysql_port }}
 socket          = /var/run/mysqld/mysqld.sock
-character-set-serve = utf8
 
 # Here is entries for some specific programs
 # The following values assume you have at least 32M ram
@@ -123,7 +122,6 @@ max_allowed_packet      = 16M
 
 [mysql]
 #no-auto-rehash # faster start of mysql but no tab completition
-character-set-serve = utf8
 
 [isamchk]
 key_buffer              = 16M
