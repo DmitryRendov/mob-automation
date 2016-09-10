@@ -1,5 +1,5 @@
 # MOB server provisioning
-# ansible-playbook -i ./inventory/dev mob-server-provision.yml --extra-vars "env=mob-server-dev source=yes env_type=dev" -vv
+# ansible-playbook -i ./inventory/dev mob-server-provision.yml --extra-vars "env=mob-server-dev source=reset env_type=dev" -vv
 # ansible-playbook -i ./inventory/live mob-server-provision.yml --extra-vars "env=mob-server env_type=live" -vv
 
 - hosts: "{{env}}"
@@ -8,7 +8,7 @@
   become_method: sudo
   gather_facts: true
   roles:
-    - mob-provision
+    - mob-server-provision
 
   vars_files:
     - host_vars/{{env}}

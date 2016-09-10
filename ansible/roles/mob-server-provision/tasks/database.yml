@@ -1,5 +1,8 @@
 ---
 
+- name: Remove the game server database
+  mysql_db: name={{ server_db_name }} state=absent
+
 - name: Create a database of the game server
   mysql_db: name={{ server_db_name }} state=present
   

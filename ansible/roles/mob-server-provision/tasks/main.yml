@@ -1,0 +1,21 @@
+---
+
+- include: packages.yml
+
+- name: Stopping all the game servers before update
+  command: echo "Stopping servers..."
+  notify: stop game servers
+- meta: flush_handlers
+
+- include: repo.yml
+
+- include: configure.yml
+  when: env_type == "live"
+
+- include: worlds.yml
+  when: source == "reset"
+
+- include: database.yml
+  when: env_type == "dev"
+
+- include: services.yml

@@ -8,10 +8,7 @@
     - "{{ server_folder }}/rc-scripts/survival"
     - "{{ server_folder }}/rc-scripts/vanilla"
 
-- name: Starting services and marked them to start on boot
-  service: name={{ item }} enabled=yes state=restarted
-  with_items:
-    - bungeecord
-    - lobby
-    - vanilla
-    - survival
+- name: Starting all the game servers before update
+  command: echo "Starting servers..."
+  notify: restart game servers
+- meta: flush_handlers 
