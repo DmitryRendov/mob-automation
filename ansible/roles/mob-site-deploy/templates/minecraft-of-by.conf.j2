@@ -53,8 +53,8 @@
         # Force browsers to not cache non-static stuff client-side
         Header merge Cache-Control no-store
 
-        WSGIDaemonProcess dmitry user=dmitry threads=2 processes=4 python-path={{ vhosts }}/{{ site_name }}/public_html:{{ vhosts }}/{{ site_name }}/python-bin/lib/python2.7/site-packages receive-buffer-size=87380 send-buffer-size=87380 deadlock-timeout=60 maximum-requests=1000 inactivity-timeout=3600
+        WSGIDaemonProcess {{ site_user }} user={{ site_user }} threads=2 processes=4 python-path={{ vhosts }}/{{ site_name }}/public_html:{{ vhosts }}/{{ site_name }}/python-bin/lib/python2.7/site-packages receive-buffer-size=87380 send-buffer-size=87380 deadlock-timeout=60 maximum-requests=1000 inactivity-timeout=3600
         WSGIScriptAlias / {{ vhosts }}/{{ site_name }}/public_html/etc/application.wsgi
-        WSGIProcessGroup dmitry
+        WSGIProcessGroup {{ site_user }}
         WSGIPassAuthorization On
 </VirtualHost>

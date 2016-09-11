@@ -9,7 +9,8 @@ site_group: minecraft
 site_home: /home/minecraft
 
 site_name: "dev.minecraft.of.by"
-site_path: "{{ site_home }}/vhosts/{{site_name}}"
+vhosts: "{{ site_home }}/vhosts"
+site_path: "{{ vhosts }}/{{site_name}}"
 site_repo: "git@github.com:DmitryRendov/mob-site.git"
 
 site_dump_src: https://www.dropbox.com/s/nx25cr2j8a8evnw/mob_site_latest.dump.gz?dl=1

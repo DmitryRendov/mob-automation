@@ -1,16 +1,19 @@
 ---
 
 - name: Check if a user has added to sudores and validate it before saving
-  lineinfile: dest=/etc/sudoers state=present regexp='^{{ user }} ALL\=' line='{{ user }} ALL=(ALL) NOPASSWD:ALL' validate='visudo -cf %s'
+  lineinfile: dest=/etc/sudoers state=present regexp='^{{ site_user }} ALL\=' line='{{ site_user }} ALL=(ALL) NOPASSWD:ALL' validate='visudo -cf %s'
 
 - name: Pre-configure git
-  template: src=config.j2 dest={{ home }}/.ssh/config owner={{ user }} group={{ group }} mode=0644
+  template: src=config.j2 dest={{ site_home }}/.ssh/config owner={{ site_user }} group={{ site_group }} mode=0644
 
 - name: Pre-configure git
-  template: src=gitconfig.j2 dest={{ home }}/.gitconfig owner={{ user }} group={{ group }} mode=0644
+  template: src=gitconfig.j2 dest={{ site_home }}/.gitconfig owner={{ site_user }} group={{ site_group }} mode=0644
 
 - name: Place the deployment key into ~/.ssh folder
-  copy: src=id_rsa_mobsitedeploy.pem dest={{ home }}/.ssh/id_rsa_mobsitedeploy.pem owner={{ user }} group={{ group }} mode=0400
+  copy: src=id_rsa_mobsitedeploy.pem dest={{ site_home }}/.ssh/id_rsa_mobsitedeploy.pem owner={{ site_user }} group={{ site_group }} mode=0400
+
+- name: Create project folder
+  file: path="{{site_path}}" state=directory mode=775 owner={{ site_user }} group={{ site_group }}
 
 - name: Create project folders if not exists
   file: path="{{site_path}}/{{ item.name }}" state=directory mode={{ item.mode }} owner={{ item.user }} group={{ item.group }}
@@ -24,25 +27,25 @@
 
 - name: Checkout site repo
   become: yes
-  become_user: "{{ user }}"
+  become_user: "{{ site_user }}"
   become_method: sudo
   git: repo={{ site_repo }} dest={{ site_path }}/public_html force=yes
 
 - name: Update publiv_html files owner
-  command: find {{ site_path }}/public_html -exec chown {{ user }}:www-data {} \;
+  command: find {{ site_path }}/public_html -exec chown {{ site_user }}:www-data {} \;
 
 - name: Ensure files are 0644
   command: find {{ site_path }}/public_html -type f -exec chmod 0644 {} \;
 
 - name: Install specified python requirements in indicated (virtualenv), step 1
   become: yes
-  become_user: "{{ user }}"
+  become_user: "{{ site_user }}"
   become_method: sudo
   pip: requirements="{{ site_path }}/public_html/requirements/production.txt" virtualenv="{{ site_path }}/python-bin"
 
 - name: Install dev dependencies, step 2
   become: yes
-  become_user: "{{ user }}"
+  become_user: "{{ site_user }}"
   become_method: sudo
   pip: requirements="{{ site_path }}/public_html/requirements/development.txt" virtualenv="{{ site_path }}/python-bin"
   when: env_type is defined and env_type == "dev"
