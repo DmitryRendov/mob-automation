@@ -20,5 +20,5 @@ server_db_dump: mob_server_latest.dump.gz
 server_db_users:
   - name: minecraft
     host: localhost
-    pass: 111
+    pass: ""
     priv: "*.*:ALL"

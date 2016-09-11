@@ -18,5 +18,5 @@ site_db_dump: mob_site_latest.dump.gz
 site_db_users:
   - name: django
     host: localhost
-    pass: 111
+    pass: ""
     priv: "*.*:ALL"
