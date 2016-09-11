@@ -5,9 +5,18 @@
 
 - name: Create a database of the game server
   mysql_db: name={{ server_db_name }} state=present
-  
+
+- name: Force custom password using if it's set as a playbook variable
+  set_fact:
+    server_db_users:
+      - name: minecraft
+        host: localhost
+        pass: "{{ password }}"
+        priv: "*.*:ALL"
+  when: password is defined
+
 - name: Create the database users
-  mysql_user: name={{ item.name }}  password={{ item.pass|default("111") }}  
+  mysql_user: name={{ item.name }}  password={{ item.pass|default("Secret123") }}
               priv={{ item.priv|default("*.*:ALL") }} state=present host={{ item.host | default("localhost") }}
   with_items: "{{ server_db_users }}"
   when: server_db_users|lower() != 'none'
@@ -20,3 +29,4 @@
 
 - name: Restore it to the site database
   mysql_db: name={{ server_db_name }} state=import target={{ mysql_dump.dest }}
+  when: env_type == "dev"
