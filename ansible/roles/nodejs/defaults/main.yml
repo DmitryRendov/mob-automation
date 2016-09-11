@@ -1,0 +1,4 @@
+---
+target_path: /tmp
+# nodejs version ("4.x", "5.x", "6.x") from https://github.com/nodesource/distributions
+nodejs_version: "6.x"
