@@ -8,6 +8,14 @@
 - name: Creating virtual host file
   template: src=minecraft-of-by.conf.j2 dest=/etc/apache2/sites-available/{{ site_name }}.conf
 
+- name: Enable Apache2 modules
+  apache2_module: name={{ item }} state=present
+  with_items:
+    - "rewrite"
+    - "wsgi"
+    - "headers"
+    - "expires"
+
 - name: a2ensite {{ site_name }}
   command: a2ensite {{ site_name }}
   args:

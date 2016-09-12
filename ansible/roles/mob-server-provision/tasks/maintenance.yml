@@ -1,0 +1,11 @@
+---
+
+- name: Stopping main game servers (survival && vanilla) before the update
+  command: "/etc/init.d/{{ item }} command \"say Сервер §c§lбудет выключен через §c§l{{ cooldown }} §c§lминут для планового обсулуживания... §2§lВернёмся назад через пару минут - потерпите!\""
+  with_items:
+    - "survival"
+    - "vanilla"
+  notify: stop game servers
+- pause: minutes={{ cooldown }}
+- meta: flush_handlers
+

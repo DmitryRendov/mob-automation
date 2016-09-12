@@ -1,4 +1,0 @@
----
-
-#- name: remove deploy key
-#  file: path={{ minecraft_home }}/.ssh/id_rsa_mobdeploy.pem state=absent

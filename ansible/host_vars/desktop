@@ -5,17 +5,3 @@
 # Common variables
 user: "dmitry"
 group: "dmitry"
-home: "/home/dmitry"
-vhosts: "/home/dmitry/vhosts"
-site_name: "minecraft.of.by"
-site_path: "{{ vhosts }}/{{site_name}}"
-site_repo: "git@github.com:DmitryRendov/mob-site.git"
-
-mysql_max_allowed_packet: "32MB"
-mysql_rootpass: "111"
-db_name: django_cms
-db_users:
-  - name: django
-    host: localhost
-    pass: 111
-    priv: "*.*:ALL"

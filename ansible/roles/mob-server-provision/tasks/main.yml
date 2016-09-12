@@ -1,0 +1,19 @@
+---
+
+- include: packages.yml
+
+- include: maintenace.yml
+  when: env_type == "live"
+
+- include: repo.yml
+
+- include: configure.yml
+  when: env_type == "live"
+
+- include: worlds.yml
+  when: source == "reset"
+
+- include: database.yml
+  when: env_type == "dev"
+
+- include: services.yml
