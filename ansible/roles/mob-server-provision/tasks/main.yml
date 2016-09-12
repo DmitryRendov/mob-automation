@@ -2,7 +2,7 @@
 
 - include: packages.yml
 
-- include: maintenace.yml
+- include: maintenance.yml
   when: env_type == "live"
 
 - include: repo.yml

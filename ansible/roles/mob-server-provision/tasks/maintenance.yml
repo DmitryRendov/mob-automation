@@ -1,7 +1,7 @@
 ---
 
 - name: Stopping main game servers (survival && vanilla) before the update
-  command: "/etc/init.d/{{ item }} command \"say Сервер §c§lбудет выключен через §c§l{{ cooldown }} §c§lминут для планового обсулуживания... §2§lВернёмся назад через пару минут - потерпите!\""
+  command: "/etc/init.d/{{ item }} command \"say РЎРµСЂРІРµСЂ В§cВ§lР±СѓРґРµС‚ РІС‹РєР»СЋС‡РµРЅ С‡РµСЂРµР· В§cВ§l{{ cooldown }} В§cВ§lРјРёРЅСѓС‚ РґР»СЏ РїР»Р°РЅРѕРІРѕРіРѕ РѕР±СЃСѓР»СѓР¶РёРІР°РЅРёСЏ... В§2В§lР’РµСЂРЅС‘РјСЃСЏ РЅР°Р·Р°Рґ С‡РµСЂРµР· РїР°СЂСѓ РјРёРЅСѓС‚ - РїРѕС‚РµСЂРїРёС‚Рµ!\""
   with_items:
     - "survival"
     - "vanilla"
