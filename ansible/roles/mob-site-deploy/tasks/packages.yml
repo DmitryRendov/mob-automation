@@ -24,6 +24,7 @@
     - liblcms2-dev
     - libwebp-dev
     - tk8.6-dev
+    - libgettextpo-dev
     - apache2
     - libapache2-mod-wsgi
     - cronolog
