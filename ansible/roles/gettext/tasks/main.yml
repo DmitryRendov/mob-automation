@@ -1,0 +1,39 @@
+---
+
+- name: Resolving dependency
+  apt: pkg={{item}} state=present
+  with_items:
+    - build-essential
+    - libgettextpo-dev
+    - tar
+    - unzip
+
+- name: Download getext
+  get_url: url="{{ gettext_url_src }}" dest=/usr/src/gettext-latest.tar.gz
+  register: gettext_package
+
+- name: Unpack the gettext package
+  shell: tar -xvf "{{ gettext_package.dest }}"
+  register: raw_gettext_folder
+  args:
+    chdir: /usr/src
+
+- set_fact:
+    gettext_folder: "/usr/src/{{ raw_gettext_folder.stdout_lines[0] }}"
+
+- name: Configure the gettext package
+  shell: "{{ gettext_folder }}configure"
+  args:
+    chdir: "{{ gettext_folder }}"
+
+- name: Build gettext package
+  make: chdir="{{ gettext_folder }}"
+  become: yes
+
+- name: Check already created gettext package
+  make: chdir="{{ gettext_folder }}" target=check
+  become: yes
+
+- name: Install gettext package into the system
+  make: chdir="{{ gettext_folder }}" target=install
+  become: yes
