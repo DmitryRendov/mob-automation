@@ -45,7 +45,8 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "mob-stage", autostart: false do |stage|
     stage.vm.network "private_network", :adapter=>2, ip: "192.168.56.77"
-    stage.vm.network "public_network", :adapter=>3, ip: "192.168.100.100", bridge: "Intel(R) Ethernet Connection I217-V"
+    # Is used ""Intel(R) Ethernet Connection I217-V" for laptop or "Realtek PCIe GBE Family Controller" for PC
+    stage.vm.network "public_network", :adapter=>3, ip: "192.168.100.100", bridge: "Realtek PCIe GBE Family Controller"
     stage.vm.provider "virtualbox" do |vb|
       vb.name = "mob-stage"
       vb.memory = "4096"
