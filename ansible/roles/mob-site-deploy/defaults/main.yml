@@ -1,4 +1,5 @@
 target_path: /tmp
+env_type: "dev"
 site_folders:
   - { name: "public_html", mode: "775", user: "{{ site_user }}", group: "www-data" }
   - { name: "logs", mode: "775", user: "root", group: "adm" }

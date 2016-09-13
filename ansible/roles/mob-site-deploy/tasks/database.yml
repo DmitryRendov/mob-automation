@@ -1,7 +1,19 @@
 ---
 
+- name: Remove the game site database
+  mysql_db: name={{ site_db_name }} state=absent
+
 - name: Create a database for the site
   mysql_db: name={{ site_db_name }} state=present
+
+- name: Force custom password using if it's set as a playbook variable
+  set_fact:
+    site_db_users:
+      - name: django
+        host: localhost
+        pass: "{{ password }}"
+        priv: "*.*:ALL"
+  when: password is defined
 
 - name: Create the database users
   mysql_user: name={{ item.name }}  password={{ item.pass|default("111") }}

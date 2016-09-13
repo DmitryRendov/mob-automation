@@ -1,6 +1,6 @@
 # MOB server provisioning
-# ansible-playbook -i ./inventory/dev mob-server-provision.yml --extra-vars "env=mob-server-dev source=reset env_type=dev" -vv
-# ansible-playbook -i ./inventory/live mob-server-provision.yml --extra-vars "env=mob-server env_type=live" -vv
+#
+# ansible-playbook -i ./inventory/live mob-server-provision.yml --extra-vars "env=mob-server password=Secret123 env_type=live" -vv
 
 - hosts: "{{env}}"
   user: vagrant

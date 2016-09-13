@@ -4,9 +4,9 @@
 
 # Common variables
 
-site_user: minecraft
-site_group: minecraft
-site_home: /home/minecraft
+site_user: dmitry
+site_group: dmitry
+site_home: /home/dmitry
 
 site_name: "dev.minecraft.of.by"
 vhosts: "{{ site_home }}/vhosts"

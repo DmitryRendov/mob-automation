@@ -29,4 +29,3 @@
 
 - name: Restore it to the site database
   mysql_db: name={{ server_db_name }} state=import target={{ mysql_dump.dest }}
-  when: env_type == "dev"
