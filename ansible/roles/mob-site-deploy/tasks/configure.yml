@@ -1,12 +1,11 @@
 ---
 # Configure virtualhost
 
-- name: Adding staging prefix for dev/staging env
-  set_fact: site_name="{{env_type}}.{{ site_name }}"
-  when: env_type is defined and env_type == "dev"
-
 - name: Creating virtual host file
   template: src=minecraft-of-by.conf.j2 dest=/etc/apache2/sites-available/{{ site_name }}.conf
+
+- name: Update site path in application.wsgi
+  replace: dest="{{ site_path }}/public_html/etc/application.wsgi" regexp="(\/home\/dmitry\/vhosts\/dev\.minecraft\.of\.by)" replace="{{ site_path }}"
 
 - name: Enable Apache2 modules
   apache2_module: name={{ item }} state=present

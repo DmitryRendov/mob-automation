@@ -14,7 +14,7 @@ server_lobby_src: ""
 server_survival_src: ""
 server_vanilla_src: ""
 
-server_dump_src: ""
+server_dump_src: https://www.dropbox.com/s/wrmuny6quwmmsad/mob_server_latest.dump.gz?dl=1
 server_db_name: mob_server
 server_db_dump: mob_server_latest.dump.gz
 server_db_users:

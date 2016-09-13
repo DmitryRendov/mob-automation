@@ -3,15 +3,12 @@
 
 - include: packages.yml
 
-- name: Adding staging prefix for dev/staging env
-  set_fact: site_path="{{ vhosts }}/{{env_type}}.{{ site_name }}"
-  when: env_type is defined and env_type == "dev"
-
 - include: repo.yml
 
 - include: configure.yml
 
 - include: database.yml
+  when: env_type == "stage" or env_type == "dev"
 
 - include: frontend.yml
 

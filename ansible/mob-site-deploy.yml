@@ -1,6 +1,6 @@
-# Provision a developer desktop machine
+# MOB site deployment
 #
-# ansible-playbook -i ./inventory/dev mob-site-deploy.yml --extra-vars "env=mob-site-dev env_type=dev" -vv
+# ansible-playbook -i ./inventory/stage mob-site-deploy.yml --extra-vars "env=mob-site-stage password=Secret123 env_type=stage" -vv
 
 - hosts: "{{env}}"
   user: vagrant
