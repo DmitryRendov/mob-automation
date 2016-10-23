@@ -20,12 +20,13 @@
         ErrorDocument 503 /static/maintenance.html
 
         RewriteEngine on
-        LogLevel warn rewrite:trace4
+        #LogLevel warn rewrite:trace4
 
         RequestHeader set HTTP_HOST {{ site_name }}
 
         # RewriteRule /robots.txt {{ vhosts }}/{{ site_name }}/robots.txt [L]
         # RewriteRule /sitemap(.*) {{ vhosts }}/{{ site_name }}/sitemap$1 [L]
+        RewriteRule /about.html /home/dmitry/vhosts/minecraft.of.by/public_html/mob/static/about.html [L]
 
         # serve static files using the /static/ format
         RewriteCond %{REQUEST_FILENAME} ^/static/(.*)
@@ -46,9 +47,12 @@
             FileETag Size
         </LocationMatch>
 
-        <Location />
-            Require all granted
-        </Location>
+        <IfVersion >= 2.4>
+          # this happens only in versions greater or equal 2.4.0.
+           <Location />
+               Require all granted
+           </Location>
+        </IfVersion>
 
         # Force browsers to not cache non-static stuff client-side
         Header merge Cache-Control no-store
