@@ -2,13 +2,13 @@
 
 #Settings
 USERNAME="dmitry"
-RESTOREPATH="/home/$USERNAME/toRestore"
-BACKUPPATH="/home/$USERNAME/backups"
+RESTOREPATH="/home/${USERNAME}/toRestore"
+BACKUPPATH="/home/${USERNAME}/backups/dev"
 NOW=`date "+%Y-%m-%d_%Hh%M"`
 
 # Mysql bases to backup
-MSB2BACKUP[0]='django_reg'
-MSB2BACKUP[1]='django_cms'
+MSB2BACKUP[0]='mob_site'
+MSB2BACKUP[1]='mob_server'
 MSB2BACKUP[2]='dymkiby'
 
 ME=`whoami`
@@ -74,4 +74,4 @@ restoredb)
         exit 1
         ;;
 esac
-exit 0
+exit 0 
