@@ -24,7 +24,7 @@
   become: yes
   become_user: "{{ minecraft_user }}"
   become_method: sudo
-  git: repo={{ server_repo }} dest={{ server_folder }} force=yes
+  git: repo={{ server_repo }} dest={{ server_folder }} force=yes accept_hostkey=yes
 
 - name: Setup servers configuration
   template: src={{ item.tmpl }} dest={{ item.dst }} owner={{ minecraft_user }} group={{ minecraft_group }} mode=0644

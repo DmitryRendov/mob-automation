@@ -1,8 +1,8 @@
 # Setup MySQL server
-# ansible-playbook -i ./inventory/dev mysql.yml --extra-vars "env=desktop mysql_engine=MyISAM" -vv
+# ansible-playbook -i ./inventory/dev mysql.yml --extra-vars "env=desktop mysql_engine=MyISAM user=vagrant" -vv
 
 - hosts: "{{env}}"
-  user: vagrant
+  user: "{{user}}"
   become: yes
   become_method: sudo
   gather_facts: true

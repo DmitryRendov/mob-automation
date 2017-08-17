@@ -1,9 +1,9 @@
 # MOB server provisioning
 #
-# ansible-playbook -i ./inventory/live mob-server-provision.yml --extra-vars "env=mob-server password=Secret123 env_type=live" -vv
+# ansible-playbook -i ./inventory/live mob-server-provision.yml --extra-vars "env=mob-server password=Secret123 env_type=live user=vagrant" -vv
 
 - hosts: "{{env}}"
-  user: vagrant
+  user: "{{user}}"
   become: yes
   become_method: sudo
   gather_facts: true
