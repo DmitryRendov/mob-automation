@@ -1,9 +1,10 @@
 # MOB site deployment
 #
-# ansible-playbook -i ./inventory/stage mob-site-deploy.yml --extra-vars "env=mob-site-stage password=Secret123 env_type=stage" -vv
+# ansible-playbook -i ./inventory/dev mob-site-deploy.yml --extra-vars "env=mobsite-dev user=dmitry env_type=dev" -vv
+# ansible-playbook -i ./inventory/live mob-site-deploy.yml --extra-vars "env=mobsite user=drendov password=VeryTopSecret123 env_type=live" -vv
 
 - hosts: "{{env}}"
-  user: vagrant
+  user: "{{user}}"
   become: yes
   become_method: sudo
   gather_facts: true

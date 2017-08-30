@@ -2,7 +2,7 @@
 # ansible-playbook -i ./inventory/dev ftp.yml --extra-vars "env=mob" -vv
 
 - hosts: "{{env}}"
-  user: vagrant
+  user: "{{user}}"
   become: yes
   become_method: sudo
   gather_facts: true

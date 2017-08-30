@@ -1,9 +1,9 @@
 # Set java 7/8 to servers
 #
-# ansible-playbook -i ./inventory/dev java.yml --extra-vars "env=mob java_version=1.8" -vv
+# ansible-playbook -i ./inventory/dev java.yml --extra-vars "env=mobsite-dev java_version=1.8 user=vagrant" -vv
 
 - hosts: "{{env}}"
-  user: vagrant
+  user: "{{user}}"
   become: yes
   become_method: sudo
   gather_facts: true

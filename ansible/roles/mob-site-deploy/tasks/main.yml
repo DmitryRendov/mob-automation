@@ -8,7 +8,7 @@
 - include: configure.yml
 
 - include: database.yml
-  when: env_type == "stage" or env_type == "dev"
+  when: env_type == "dev"
 
 - include: frontend.yml
 
