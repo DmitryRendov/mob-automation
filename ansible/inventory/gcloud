@@ -1,0 +1,5 @@
+[local]
+localhost         ansible_port=50223
+
+[mob-gcloud]
+mobserver-gcloud  ansible_ssh_host=35.197.49.180 ansible_port=50223

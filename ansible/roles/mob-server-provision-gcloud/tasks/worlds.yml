@@ -1,0 +1,15 @@
+---
+
+- name: Ensure Survival server folders are present
+  file: path={{ server_folder }}/survival/{{ item }}/ state=directory mode=0755 owner={{ minecraft_user }} group={{ minecraft_group }}
+  with_items:
+    - "survival"
+    - "survival_nether"
+    - "survival_the_end"
+
+- name: Restore Survial server from the backup (Storage bucket)
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  get_url: url={{ server_survival_src }} dest={{ target_path }} mode=0644 timeout=600
+  register: sourcedl_survival
+
