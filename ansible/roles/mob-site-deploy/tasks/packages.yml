@@ -13,10 +13,10 @@
     - libxml2-dev
     - libxslt1-dev
     - python-mysqldb
-    - libmysqlclient-dev
+    - libmariadbclient-dev-compat
     - zlib1g
     - libfreetype6
-    - libopenjpeg-dev
+    - libopenjp2-7-dev
     - libfreetype6-dev
     - libtiff5-dev
     - liblcms2-dev

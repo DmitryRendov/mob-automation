@@ -6,12 +6,8 @@
     - build-essential
     - apt-transport-https
 
-#- name: Adding nodejs gpg key
-#  apt_key: url=https://deb.nodesource.com/gpgkey/nodesource.gpg.key  state=present
-
-# Workarround in case of issue "Failed to validate the SSL certificate"
-- name: add_docker_apt_key
-  shell: "/usr/bin/curl https://deb.nodesource.com/gpgkey/nodesource.gpg.key | /usr/bin/apt-key add -"
+- name: Adding nodejs gpg key
+  apt_key: url=https://deb.nodesource.com/gpgkey/nodesource.gpg.key  state=present
 
 - name: Adding nodejs repos
   apt_repository:  repo="{{ item }}" state=present
