@@ -1,0 +1,28 @@
+---
+
+- name: Update mysql passwords in live config
+  replace: dest="{{server_folder }}/{{ item.name }}" regexp="{{ item.regexp }}" replace="{{ item.value }}"
+  with_items:
+    - name: "bungeecord/plugins/SkinsRestorer/config.yml"
+      regexp: "^(\\s+)Password: (111)$"
+      value: "  Password: {{ password }}"
+
+    - name: "lobby/plugins/AuthMe/config.yml"
+      regexp: "^(\\s+)mySQLPassword: '(111)'$"
+      value: "    mySQLPassword: '{{ password }}'"
+
+    - name: "survival/plugins/LogBlock/config.yml"
+      regexp: "^(\\s+)password: (111)$"
+      value: "  password: {{ password }}"
+
+    - name: "survival/plugins/PermissionsEx/config.yml"
+      regexp: "^(\\s+)password: (111)$"
+      value: "      password: {{ password }}"
+
+    - name: "survival/plugins/WorldGuard/config.yml"
+      regexp: "^(\\s+)password: (111)$"
+      value: "        password: {{ password }}"
+
+    - name: "survival/plugins/WorldGuard/config.yml"
+      regexp: "^(\\s+)pass: '(111)'$"
+      value: "            pass: {{ password }}"

@@ -16,3 +16,4 @@
   with_items:
     - boto
     - docker-py
+    - apache-libcloud
