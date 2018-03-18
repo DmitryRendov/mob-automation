@@ -2,8 +2,9 @@
 localhost
 
 [mob-live]
-mobsite       ansible_ssh_host=35.185.236.93   ansible_port=50223
-mobserver     ansible_ssh_host=35.199.167.203  ansible_port=50223
+mobsite       ansible_ssh_host=35.185.236.93  ansible_port=50223
+mobserver-out ansible_ssh_host=86.57.153.24   ansible_port=50223
+mobserver-in  ansible_ssh_host=192.168.100.15 ansible_port=1222
 
 [demon-live]
 demon-of-by   ansible_ssh_host=54.237.212.64 ansible_port=1222

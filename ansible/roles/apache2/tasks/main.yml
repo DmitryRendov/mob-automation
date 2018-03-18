@@ -8,7 +8,7 @@
     - libapache2-mod-wsgi
     - git
     - python-mysqldb
-    - libmysqlclient-dev
+    - libmariadbclient-dev-compat
     - cronolog
 
 - name: enabled Apache modules
