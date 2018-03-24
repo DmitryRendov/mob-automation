@@ -1,0 +1,8 @@
+################################################
+##          Provision Variables               ##
+################################################
+
+# Common variables
+
+inventory_hostname_short: "minecraft"
+inventory_hostname:  "minecraft.of.by"
