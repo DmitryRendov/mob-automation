@@ -1,7 +1,0 @@
----
-
-- name: Installing server-specific packages by APT
-  apt: pkg={{item}} state=present
-  with_items:
-    - screen
-    - git

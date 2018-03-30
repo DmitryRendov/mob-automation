@@ -3,4 +3,4 @@
 allow_duplicates: false
 
 dependencies:
-  - docker-hub
+  - java1.8-oracle-centos

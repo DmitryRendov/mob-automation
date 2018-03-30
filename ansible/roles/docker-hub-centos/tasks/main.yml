@@ -1,0 +1,34 @@
+---
+# Install Docker role
+
+- name: Update Yum cache
+  yum:
+    name: '*'
+    update_cache: yes
+
+- name: Install python setup tools
+  yum: name=python-setuptools
+
+- name: Install Pypi
+  easy_install: name=pip
+
+- name: Install some packages via PIP to support Ansible
+  pip: name="{{ item }}"
+  with_items:
+    - six
+    - docker-compose
+
+- name: Install Docker-PY to support Ansible
+  pip: name=docker-py version=1.9.0 state=forcereinstall
+
+- name: Download Docker installation package
+  shell: "wget -qO- https://get.docker.com/ | sh"
+
+- name: Install Docker
+  command: "usermod -aG docker user"
+
+- name: Set Docker to start automatically at boot time
+  command: "systemctl enable docker.service"
+
+- name: Make sure Docker is running
+  service: name=docker state=running

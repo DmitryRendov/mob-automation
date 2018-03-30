@@ -4,5 +4,5 @@
 
 # Common variables
 
-inventory_hostname_short: "minecraft"
-inventory_hostname:  "minecraft.of.by"
+inventory_hostname_short: "mail"
+inventory_hostname:  "mail.minecraft.of.by"

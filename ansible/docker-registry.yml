@@ -9,6 +9,3 @@
   roles:
     - role: 'docker-registry'
       become: true
-
-  vars_files:
-    - "host_vars/docker-registry"

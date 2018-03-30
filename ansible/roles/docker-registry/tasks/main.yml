@@ -1,4 +1,8 @@
 ---
+
+- name: Create a project folder if not exists
+  file: path={{ docker_registry_storage }} state=directory mode=0755 owner=root group=root
+
 - name: Ensure docker volume mapping host directories exist
   file:
     state: directory
@@ -8,7 +12,6 @@
   tags:
     - install
     - upgrade
-
 
 - name: Ensure docker volume mapping host file directories exist
   file:
