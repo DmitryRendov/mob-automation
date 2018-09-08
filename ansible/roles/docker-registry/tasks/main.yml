@@ -35,7 +35,7 @@
     - upgrade
 
 - name: Run docker registry container
-  docker:
+  docker_container:
     env: "{{ docker_registry_env }}"
     expose: "{{ docker_registry_expose }}"
     image: "{{ docker_registry_image }}"
@@ -44,9 +44,9 @@
     volumes: "{{ docker_registry_volumes }}"
     log_driver: "{{ docker_registry_log_driver }}"
     log_opt: "{{ docker_registry_log_opt }}"
-    pull: always
+    pull: yes
     restart_policy: always
-    state: reloaded
+    state: started
   tags:
     - install
     - upgrade
