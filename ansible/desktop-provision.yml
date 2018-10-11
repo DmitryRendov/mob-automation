@@ -1,6 +1,6 @@
 # Provision a developer desktop machine
 #
-# ansible-playbook -i ./inventory/dev desktop-provision.yml --extra-vars "env=desktop" -vv
+# ansible-playbook -i ./inventory/dev desktop-provision.yml --extra-vars "env=mobsite-dev" -vv
 
 - hosts: "{{env}}"
   user: vagrant

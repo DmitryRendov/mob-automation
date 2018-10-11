@@ -1,0 +1,11 @@
+# setup Docker registry V2 on the server
+#
+# ansible-playbook -i ./inventory/registry docker-registry.yml --extra-vars "env=docker-registry user=user"
+
+- hosts: "{{env}}"
+  user: "{{user}}"
+  become: yes
+  become_method: sudo
+  roles:
+    - role: 'docker-registry'
+      become: true

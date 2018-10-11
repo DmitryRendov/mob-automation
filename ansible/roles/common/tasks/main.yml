@@ -76,7 +76,7 @@
   when: ansible_os_family == "CentOS"
 
 - name: Set bash config
-  template: src=.bashrc.j2 dest=/home/{{ssh_user}}/.bashrc
+  template: src=.bashrc.j2 dest=/home/{{user}}/.bashrc
 
 - name: Set root bash config
   template: src=.bashrc.j2 dest=/root/.bashrc
@@ -85,6 +85,6 @@
   template: src=vimrc.j2 dest=/etc/vimrc
 
 - name: Add ssh key for authentication
-  authorized_key: key="{{item}}" user="{{ssh_user}}"
+  authorized_key: key="{{item}}" user="{{user}}"
   with_items:
     - "{{ ansible_ssh_key }}"

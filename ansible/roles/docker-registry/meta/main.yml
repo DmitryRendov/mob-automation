@@ -1,0 +1,6 @@
+---
+
+allow_duplicates: false
+
+dependencies:
+  - docker-hub

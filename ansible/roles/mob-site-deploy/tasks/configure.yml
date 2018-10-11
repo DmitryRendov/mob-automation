@@ -15,8 +15,8 @@
     - "headers"
     - "expires"
 
-- name: a2ensite {{ site_name }}
-  command: a2ensite {{ site_name }}
+- name: a2ensite {{ site_name }}.conf
+  command: a2ensite {{ site_name }}.conf
   args:
     creates: /etc/apache2/sites-enabled/{{ site_name }}.conf
   notify:

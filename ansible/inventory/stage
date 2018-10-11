@@ -1,6 +1,0 @@
-[local]
-localhost
-
-[mob-stage]
-mob-server-stage  ansible_ssh_host=192.168.100.100
-mob-site-stage    ansible_ssh_host=192.168.100.100

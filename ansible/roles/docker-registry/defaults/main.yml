@@ -1,0 +1,32 @@
+---
+# Docker registry config
+registry_state: started
+
+# Docker configuration
+docker_registry_image: registry:2
+docker_registry_env:
+  SEARCH_BACKEND: sqlalchemy
+
+docker_registry_name: registry
+docker_registry_home: "/var/lib/docker-registry"
+docker_registry_storage: "/mnt/docker-registry"
+docker_registry_host_conf_file: "/etc/registry/config.yml"
+docker_registry_container_conf_file: "/etc/docker/registry/config.yml"
+docker_registry_command: ""
+docker_registry_expose:
+  - 5000
+docker_registry_ports:
+  - 5000:5000
+docker_registry_directory_volumes:
+  - "{{ docker_registry_storage }}:{{ docker_registry_home }}:rw"
+docker_registry_file_volumes:
+  - "{{ docker_registry_host_conf_file }}:{{ docker_registry_container_conf_file }}:ro"
+docker_registry_template_path: ""
+docker_registry_volumes: "{{ docker_registry_directory_volumes + docker_registry_file_volumes }}"
+docker_registry_log_driver: syslog
+docker_registry_log_opt:
+  syslog-facility: local0
+  tag: "{{ docker_registry_name }}"
+docker_registry_memory_limit: 512MB
+docker_registry_net: default
+

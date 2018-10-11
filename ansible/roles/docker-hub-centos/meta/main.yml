@@ -1,0 +1,6 @@
+---
+
+allow_duplicates: false
+
+dependencies:
+  - java1.8-oracle-centos

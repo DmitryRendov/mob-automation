@@ -3,14 +3,13 @@ localhost
 
 [services]
 ansible         ansible_ssh_host=192.168.56.101
-ci              ansible_ssh_host=192.168.56.101
-
-[dev]
-desktop         ansible_ssh_host=192.168.56.99
+docker-registry ansible_ssh_host=192.168.56.123
+jenkins         ansible_ssh_host=192.168.56.123
+artifactory     ansible_ssh_host=192.168.56.123
 
 [mob-dev]
-mob-server-dev  ansible_ssh_host=192.168.56.25
-mob-site-dev    ansible_ssh_host=192.168.56.99
+mobserver-dev   ansible_ssh_host=192.168.56.123
 
 [demon-dev]
-demon-dev       ansible_ssh_host=192.168.56.99
+demon-of-by-dev ansible_ssh_host=192.168.56.123
+

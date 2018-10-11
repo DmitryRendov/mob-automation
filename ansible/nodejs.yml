@@ -1,8 +1,8 @@
 # Setup nodejs
-# ansible-playbook -i ./inventory/dev nodejs.yml --extra-vars "env=mob-site-dev" -vv
+# ansible-playbook -i ./inventory/dev nodejs.yml --extra-vars "env=mobsite-dev user=dmitry" -vv
 
 - hosts: "{{env}}"
-  user: vagrant
+  user: "{{user}}"
   become: yes
   become_method: sudo
   gather_facts: true
