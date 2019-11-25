@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  registry:
+    image: registry:2
+    ports:
+    - "5000:5000"
+    environment:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+    volumes:
+      - ./data:/data
+    networks:
+      - mob
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '8080:80'
+    environment:
+      PMA_HOST: 172.19.0.1  # Make sure that this IP is host IP in your Docker network
+      PMA_USER: root
+      PMA_PORT: 3306
+      PMA_PASSWORD: 111     # Do not forget to grant access - GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.19.0.%' IDENTIFIED BY '111'; FLUSH PRIVILEGES;
+    networks:
+      - mob
+
+networks:
+  mob:
