@@ -17,23 +17,39 @@ services:
     ports:
       - '8080:80'
     environment:
-      PMA_HOST: 172.19.0.1  # Make sure that this IP is host IP in your Docker network
+      PMA_HOST: 172.18.0.1  # Make sure that this IP is host IP in your Docker network
       PMA_USER: root
       PMA_PORT: 3306
-      PMA_PASSWORD: 111     # Do not forget to grant access - GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.19.0.%' IDENTIFIED BY '111'; FLUSH PRIVILEGES;
+      PMA_PASSWORD: 111   # Do not forget to grant access - GRANT ALL PRIVILEGES ON *.* TO 'root'@'172.19.0.%' IDENTIFIED BY '111'; FLUSH PRIVILEGES;
+    container_name: phpmyadmin
     networks:
       - mob
 
   dropbox:
     image: dropbox
+    restart: always
     environment:
       DBOX_UID: 1000
       DBOX_GID: 1000
     volumes:
       - /home/minecraft/Dropbox:/dbox/Dropbox
       - /home/minecraft/.dropbox:/dbox/.dropbox
-    networks:
-      - mob
+    network_mode: host
+
+  minidlna:
+    image: vladgh/minidlna
+    restart: always
+    environment:
+      MINIDLNA_MEDIA_DIR_1: "V,/media/films"
+      MINIDLNA_MEDIA_DIR_2: "V,/media/multics"
+      MINIDLNA_MEDIA_DIR_3: "V,/media/serials"
+      MINIDLNA_FRIENDLY_NAME: "HomeServer"
+    volumes:
+      - "/mnt/storage/Films:/media/films:ro"
+      - "/mnt/storage/Multics:/media/multics:ro"
+      - "/mnt/storage/Serials:/media/serials:ro"
+    container_name: minidlna
+    network_mode: host
 
 networks:
   mob:
