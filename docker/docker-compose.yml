@@ -35,5 +35,24 @@ services:
     networks:
       - mob
 
+  7dtd:
+    image: zobees/steamcmd
+    #tty: true
+    #stdin_open: true
+    network_mode: host
+    command: "steamcmd-wrapper ./7DaysToDieServer.x86_64 -logfile /dev/stdout -configfile=serverconfig.xml -quit -batchmode -nographics -dedicated"
+    environment:
+      STEAMCMD_APP_ID: "294420"
+      STEAMCMD_SKIP: "true"
+      USER_UID: "1000"
+      USER_GID: "1000"
+    ports:
+      - "26900:26900"
+      - "26900-26902:26900-26902/udp"
+      - "8081:8081"
+    volumes:
+      - "~/.steam/7dtd/data:/data"
+      - "~/.steam/7dtd/saves:/home/steam/.local/share/7DaysToDie/Saves"
+
 networks:
   mob:
