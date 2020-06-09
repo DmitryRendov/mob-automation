@@ -70,5 +70,17 @@ services:
       - "~/.steam/7dtd/data:/data"
       - "~/.steam/7dtd/saves:/home/steam/.local/share/7DaysToDie/Saves"
 
+  starbound:
+    image: starbound
+    environment:
+      USER_UID: "1000"
+      USER_GID: "1000"
+    ports:
+      - "21025-21026:21025-21026"
+    volumes:
+      - "~/.gog/Starbound:/starbound"
+    network_mode: host
+
+
 networks:
   mob:
