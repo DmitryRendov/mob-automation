@@ -1,0 +1,8 @@
+{
+    "variable": {
+        "environment": {
+            "default": "UNCONFIGURED",
+            "description": "(required) used throughout to segregate remote storage and pick setting from map variables"
+        }
+    }
+}

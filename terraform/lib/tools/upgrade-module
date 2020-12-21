@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Input is a path to a module (i.e. modules/site/alb/v2)
+CURRENT_MODULE=$1
+# Increment v2 -> v3
+NEW_MODULE=$(echo $CURRENT_MODULE | perl -lpe 'BEGIN { sub inc { my ($num) = @_; ++$num } } s/([0-9]+)$/inc($1)/eg' -)
+
+mv $CURRENT_MODULE $NEW_MODULE
+# Replace all references to old module with new one
+git grep -l "$*" | xargs perl -pi -e "s@$CURRENT_MODULE@$NEW_MODULE@g"

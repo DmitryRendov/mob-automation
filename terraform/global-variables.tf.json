@@ -1,0 +1,85 @@
+{
+  "locals": {
+    "//": "Note: the keypair name will always stay mobadmin.",
+    "keypair_content": "ssh-rsa Terraform managed AWS keypair mob_ops-v3",
+    "keypair_name": "mobadmin"
+  },
+  "provider": [
+    {
+      "aws": {
+        "assume_role": {
+          "role_arn": "arn:aws:iam::${local.aws_account_id}:role/${var.terraform_exec_role}",
+          "session_name": "terraform"
+        },
+        "profile": "sts",
+        "region": "${var.region}",
+        "version": "2.41.0"
+      }
+    },
+    {
+      "aws": {
+        "alias": "alpha",
+        "assume_role": {
+          "role_arn": "arn:aws:iam::${var.aws_account_map[\"alpha\"]}:role/${var.terraform_exec_role}",
+          "session_name": "terraform"
+        },
+        "profile": "sts",
+        "region": "${var.region}",
+        "version": "2.41.0"
+      }
+    },
+    {
+      "aws": {
+        "alias": "bastion",
+        "assume_role": {
+          "role_arn": "arn:aws:iam::${var.aws_account_map[\"bastion\"]}:role/${var.terraform_exec_role}",
+          "session_name": "terraform"
+        },
+        "profile": "sts",
+        "region": "${var.region}",
+        "version": "2.41.0"
+      }
+    },
+    {
+      "template": {
+        "version": "2.1.2"
+      }
+    },
+    {
+      "null": {
+        "version": "2.1.2"
+      }
+    }
+  ],
+  "terraform": {
+    "required_version": ">=0.12.12"
+  },
+  "variable": {
+    "aws_account_map": {
+      "default": {
+        "alpha": "501055688096",
+        "bastion": "501055688096"
+      }
+    },
+    "corp_subnets": {
+      "default": [
+        "86.57.153.24/32",
+        "86.57.255.89/29"
+      ],
+      "description": "List of allowed networks."
+    },
+    "terraform_exec_role": {
+      "default": "super-user",
+      "description": "Default role to create terraform resources"
+    },
+    "terraform_remote_state_bucket": {
+      "default": "mob-terraform-state",
+      "description": "Terraform remote s3 backend bucket name"
+    },
+    "terraform_remote_state_region": {
+      "default": "us-east-1",
+      "description": "Terraform remote s3 storage region"
+    }
+
+  }
+}

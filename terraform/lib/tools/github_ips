@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+# https://help.github.com/articles/about-github-s-ip-addresses/
+token=$(git config hsterraform.token) || true
+
+if [[ -n "$token" ]]; then
+    CURL_FLAGS="-H \"Authorization: token $token\""
+fi
+
+curl "$CURL_FLAGS" -fsS https://api.github.com/meta | \
+    jq '{ ips: .hooks | join(",") }'

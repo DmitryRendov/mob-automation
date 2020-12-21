@@ -1,0 +1,20 @@
+#!/bin/bash 
+set -xuo pipefail
+
+# Get current script directory
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+NAME=$1
+ACCOUNT_ID=$(jq -r < global-variables.tf.json .variable.aws_account_map.default.${NAME})
+
+## Or true because 'read' returns failure when it encounters EOF, which is what our heredoc ends with
+read -d '' JQ <<-HERE || true
+.variable.aws_account_id.default |= "${ACCOUNT_ID}"
+| .variable.account_name.default |= "${NAME}"
+HERE
+
+jq --sort-keys --indent 2 < ${DIR}/../account_template/account-variables.tf.json.template "$JQ" > account-variables.tf.json
+
+aws --profile $NAME-super-user configure set role_arn arn:aws:iam::$ACCOUNT_ID:role/super-user
+aws --profile $NAME-super-user configure set region us-east-1
+#aws --profile $NAME-super-user configure set source_profile sts

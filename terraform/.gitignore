@@ -1,0 +1,24 @@
+*.tfstate
+*.tfstate.backup
+.terraform/
+environment.sh
+environment_override.tf.json
+saved-plan
+saved*plan
+*.pyc
+/global/iam/server_certificates/ssl_certs/*.key
+**/crash.log
+/prod/api-background/user-data
+**/terraform.tfstate.*.backup
+.idea
+*.iml
+headspace/roles/ecs/ecs_service_scale_out/latest.zip
+headspace/roles/aurora-snapshot-tool/files/*.zip
+headspace/roles/ebs-snapshot-tool/files/*.zip
+.DS_Store
+.vscode/
+
+#files made by the tf_workspace_cleanup.py
+atlantis_workspaces.json
+tf_backend_workspaces.json
+show_workspaces_not_in_atlantis.sh

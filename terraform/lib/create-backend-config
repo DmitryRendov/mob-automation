@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Get current script directory
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+## Or true because 'read' returns failure when it encounters EOF, which is what our heredoc ends with
+read -d '' JQ <<-"HERE" || true
+.terraform.backend.s3.region |= $v[0]["variable"]["terraform_remote_state_region"]["default"]
+| .terraform.backend.s3.key |= ($a[0]["variable"]["account_name"]["default"]) + "/" + $rolepath + "/" + $role
+| .terraform.backend.s3.bucket |= $v[0]["variable"]["terraform_remote_state_bucket"]["default"]
+| .terraform.backend.s3.profile |= $g[0]["profile"]
+| .terraform.backend.s3.role_arn |= $g[0]["role_arn"]
+| .terraform.backend.s3.session_name |= $g[0]["session_name"]
+| .terraform.backend.s3.encrypt = "true"
+HERE
+
+jq                                                 \
+    --sort-keys                                    \
+    --indent 2                                     \
+    --null-input                                   \
+    --raw-output                                   \
+    --slurpfile a account-variables.tf.json        \
+    --slurpfile g $DIR/backend-config.global.json  \
+    --slurpfile v $DIR/../global-variables.tf.json \
+    --arg role $1                                  \
+    --arg rolepath $(basename $(dirname $(pwd)))   \
+    "$JQ"                                          \
+    > backend.tf.json

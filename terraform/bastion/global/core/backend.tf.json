@@ -1,0 +1,13 @@
+{
+  "terraform": {
+    "backend": {
+      "s3": {
+        "bucket": "hs-terraform-state",
+        "key": "bastion/global/core",
+        "profile": "sts",
+        "region": "us-west-2",
+        "session_name": "terraform"
+      }
+    }
+  }
+}
