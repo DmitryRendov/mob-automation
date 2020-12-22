@@ -12,12 +12,12 @@ output "org" {
 }
 
 module "audit" {
-  source = "./module"
+  source = "../../../modules/base/aws-organization-account/v1"
   name   = "audit"
 }
 
 module "bastion" {
-  source = "./module"
+  source = "../../../modules/base/aws-organization-account/v1"
   name   = "bastion"
 }
 

@@ -1,12 +1,12 @@
-data "terraform_remote_state" "audit" {
+data "terraform_remote_state" "master_accounts" {
   backend = "s3"
 
   config {
-    key          = "audit/global/global"
-    bucket       = var.tf_remote_state_s3_storage_bucket
-    region       = var.tf_remote_state_s3_storage_region
+    key          = "master/global/accounts"
+    bucket       = var.terraform_remote_state_bucket
+    region       = var.terraform_remote_state_region
     profile      = "sts"
-    role_arn     = "arn:aws:iam::${var.aws_account_map["headspace_prod"]}:role/${var.terraform_exec_role}"
+    role_arn     = "arn:aws:iam::${var.aws_account_map["master"]}:role/${var.terraform_exec_role}"
     session_name = "terraform"
   }
 }
