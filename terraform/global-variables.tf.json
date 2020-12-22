@@ -1,9 +1,4 @@
 {
-  "locals": {
-    "//": "Note: the keypair name will always stay mobadmin.",
-    "keypair_content": "ssh-rsa Terraform managed AWS keypair mob_ops-v3",
-    "keypair_name": "mobadmin"
-  },
   "provider": [
     {
       "aws": {
@@ -18,9 +13,9 @@
     },
     {
       "aws": {
-        "alias": "alpha",
+        "alias": "audit",
         "assume_role": {
-          "role_arn": "arn:aws:iam::${var.aws_account_map[\"alpha\"]}:role/${var.terraform_exec_role}",
+          "role_arn": "arn:aws:iam::${var.aws_account_map[\"audit\"]}:role/${var.terraform_exec_role}",
           "session_name": "terraform"
         },
         "profile": "sts",
@@ -33,6 +28,18 @@
         "alias": "bastion",
         "assume_role": {
           "role_arn": "arn:aws:iam::${var.aws_account_map[\"bastion\"]}:role/${var.terraform_exec_role}",
+          "session_name": "terraform"
+        },
+        "profile": "sts",
+        "region": "${var.region}",
+        "version": "2.41.0"
+      }
+    },
+    {
+      "aws": {
+        "alias": "master",
+        "assume_role": {
+          "role_arn": "arn:aws:iam::${var.aws_account_map[\"master\"]}:role/${var.terraform_exec_role}",
           "session_name": "terraform"
         },
         "profile": "sts",
@@ -57,8 +64,9 @@
   "variable": {
     "aws_account_map": {
       "default": {
-        "alpha": "501055688096",
-        "bastion": "501055688096"
+        "audit": "652427744890",
+        "bastion": "143430375923",
+        "master": "501055688096"
       }
     },
     "corp_subnets": {

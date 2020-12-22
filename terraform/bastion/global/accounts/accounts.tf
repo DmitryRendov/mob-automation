@@ -1,12 +1,20 @@
-#module "alpha" {
-#  source = "./module"
-#  name   = "alpha"
-#}
+resource "aws_organizations_organization" "mob" {
+  aws_service_access_principals = [
+    "cloudtrail.amazonaws.com",
+    "config.amazonaws.com",
+  ]
 
-#module "audit" {
-#  source = "./module"
-#  name   = "audit"
-#}
+  feature_set = "ALL"
+}
+
+output "org" {
+  value = aws_organizations_organization.mob
+}
+
+module "audit" {
+  source = "./module"
+  name   = "audit"
+}
 
 module "bastion" {
   source = "./module"
@@ -15,8 +23,7 @@ module "bastion" {
 
 output "account_ids" {
   value = {
-#    "alpha"   = module.alpha.account_id
-#    "audit"   = module.audit.account_id
+    "audit"   = module.audit.account_id
     "bastion" = module.bastion.account_id
   }
 }

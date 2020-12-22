@@ -24,7 +24,6 @@ module "example_staging" {
 }
 ```
 
-
 #### Account without multiple environments
 ```hcl
 module "example" {
@@ -36,6 +35,8 @@ module "example" {
 - Run ```make apply```
 - Note output value for the account id
 
+
+
 ## Login
 - Login to AWS using root credentials and click on forgot password
 - Reset password and add credentials to LastPass
@@ -44,7 +45,6 @@ module "example" {
 ## Create Account in Terraform
 - Add the new account to the account map in *global-variables.tf.json*
 - Create a new provider in *global-variables.tf.json*
-
 - Update /modules/user-roles/ to create a role for users in the new account
 
 #### Note: for accounts with multiple environments only run make new-account-ACCOUNTNAME once without the environment
@@ -63,8 +63,9 @@ Find the latest version of the all-accounts-aws-config-rules module and run `mak
 #### Create foundational roles
 - networking
 
-## Delete an AWS account in Terraform
 
+
+## Delete an AWS account in Terraform
 
 >NOTE: The following is mostly in hs-terraform repo. Pretty much "Add an AWS account" in reverse with some exceptions.
 
