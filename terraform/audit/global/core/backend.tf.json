@@ -1,0 +1,13 @@
+{
+  "terraform": {
+    "backend": {
+      "s3": {
+        "bucket": "mob-terraform-state",
+        "key": "audit/global/core",
+        "profile": "sts",
+        "region": "us-east-1",
+        "session_name": "terraform"
+      }
+    }
+  }
+}

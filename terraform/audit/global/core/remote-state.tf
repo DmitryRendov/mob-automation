@@ -1,7 +1,7 @@
 data "terraform_remote_state" "master_core" {
   backend = "s3"
 
-  config {
+  config = {
     key          = "master/global/core"
     bucket       = var.terraform_remote_state_bucket
     region       = var.terraform_remote_state_region

@@ -1,8 +1,8 @@
-data "terraform_remote_state" "master_core" {
+data "terraform_remote_state" "master_accounts" {
   backend = "s3"
 
   config {
-    key          = "master/global/core"
+    key          = "master/global/accounts"
     bucket       = var.terraform_remote_state_bucket
     region       = var.terraform_remote_state_region
     profile      = "sts"
