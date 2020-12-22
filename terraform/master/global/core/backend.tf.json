@@ -2,10 +2,10 @@
   "terraform": {
     "backend": {
       "s3": {
-        "bucket": "hs-terraform-state",
-        "key": "bastion/global/core",
+        "bucket": "mob-terraform-state",
+        "key": "master/global/core",
         "profile": "sts",
-        "region": "us-west-2",
+        "region": "us-east-1",
         "session_name": "terraform"
       }
     }

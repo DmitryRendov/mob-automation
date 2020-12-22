@@ -1,7 +1,7 @@
 {
   "variable": {
     "environment": {
-      "default": "bastion",
+      "default": "master",
       "description": "(required) used throughout to segregate remote storage and pick setting from map variables"
     }
   }

@@ -5,7 +5,7 @@
   },
   "variable": {
     "account_name": {
-      "default": "bastion",
+      "default": "master",
       "description": "The name of this account"
     },
     "aws_account_id": {
