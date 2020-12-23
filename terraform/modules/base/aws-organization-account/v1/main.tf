@@ -9,7 +9,7 @@ resource "aws_organizations_account" "account" {
   role_name = "super-user"
 
   lifecycle {
-    prevent_destroy = true
+    #prevent_destroy = true
     ignore_changes  = [role_name]
   }
 }

@@ -5,11 +5,11 @@
   },
   "variable": {
     "account_name": {
-      "default": "master",
+      "default": "production",
       "description": "The name of this account"
     },
     "aws_account_id": {
-      "default": "501055688096",
+      "default": "562495469185",
       "description": "The account number for this account"
     },
     "region": {

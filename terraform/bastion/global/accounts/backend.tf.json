@@ -1,0 +1,14 @@
+{
+  "terraform": {
+    "backend": {
+      "s3": {
+        "bucket": "mob-terraform-state",
+        "encrypt": "true",
+        "key": "bastion/global/accounts",
+        "profile": "sts",
+        "region": "us-east-1",
+        "session_name": "terraform"
+      }
+    }
+  }
+}

@@ -19,11 +19,24 @@ module "audit" {
 module "bastion" {
   source = "../../../modules/base/aws-organization-account/v1"
   name   = "bastion"
+  email  = "drendov@gmail.com"
+}
+
+module "production" {
+  source = "../../../modules/base/aws-organization-account/v1"
+  name   = "production"
+}
+
+module "staging" {
+  source = "../../../modules/base/aws-organization-account/v1"
+  name   = "staging"
 }
 
 output "account_ids" {
   value = {
-    "audit"   = module.audit.account_id
-    "bastion" = module.bastion.account_id
+    "audit"      = module.audit.account_id
+    "bastion"    = module.bastion.account_id
+    "production" = module.production.account_id
+    "staging"    = module.staging.account_id
   }
 }

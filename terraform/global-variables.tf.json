@@ -37,9 +37,21 @@
     },
     {
       "aws": {
-        "alias": "master",
+        "alias": "production",
         "assume_role": {
-          "role_arn": "arn:aws:iam::${var.aws_account_map[\"master\"]}:role/${var.terraform_exec_role}",
+          "role_arn": "arn:aws:iam::${var.aws_account_map[\"production\"]}:role/${var.terraform_exec_role}",
+          "session_name": "terraform"
+        },
+        "profile": "sts",
+        "region": "${var.region}",
+        "version": "2.41.0"
+      }
+    },
+    {
+      "aws": {
+        "alias": "staging",
+        "assume_role": {
+          "role_arn": "arn:aws:iam::${var.aws_account_map[\"staging\"]}:role/${var.terraform_exec_role}",
           "session_name": "terraform"
         },
         "profile": "sts",
@@ -65,8 +77,9 @@
     "aws_account_map": {
       "default": {
         "audit": "652427744890",
-        "bastion": "143430375923",
-        "master": "501055688096"
+        "bastion": "501055688096",
+        "production": "562495469185",
+        "staging": "143430375923"
       }
     },
     "corp_subnets": {

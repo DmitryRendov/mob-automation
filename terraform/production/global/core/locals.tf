@@ -1,4 +1,4 @@
 locals {
-  role_name = "bootstrap"
+  role_name = "core"
   team      = "ops"
 }

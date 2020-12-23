@@ -3,8 +3,7 @@
     "backend": {
       "s3": {
         "bucket": "mob-terraform-state",
-        "encrypt": "true",
-        "key": "master/global/accounts",
+        "key": "production/global/core",
         "profile": "sts",
         "region": "us-east-1",
         "session_name": "terraform"

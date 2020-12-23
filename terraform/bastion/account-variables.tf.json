@@ -1,0 +1,19 @@
+{
+  "locals": {
+    "account_name": "${var.account_name}",
+    "aws_account_id": "${var.aws_account_id}"
+  },
+  "variable": {
+    "account_name": {
+      "default": "bastion",
+      "description": "The name of this account"
+    },
+    "aws_account_id": {
+      "default": "501055688096",
+      "description": "The account number for this account"
+    },
+    "region": {
+      "default": "us-east-1"
+    }
+  }
+}
