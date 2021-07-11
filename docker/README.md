@@ -20,8 +20,9 @@ Second, (re)build docker images:
 $ docker build -t starbound .
 ```
 
-Third, run services using docker-compose:
+Third, run services using docker-compose in detached mode:
 ```sh
+$ docker-compose up -d starbound
 $ 
 ```
 
@@ -30,10 +31,21 @@ $
 Dont forget to open ports in the firewall:
 ```sh
 $ sudo firewall-cmd --permanent --add-port=25565/tcp
+$ sudo firewall-cmd --permanent --add-port=21025/tcp
 $ sudo firewall-cmd --permanent --add-port=8123/tcp
 $ sudo firewall-cmd --reload
 $ sudo firewall-cmd --list-all
 ```
+
+Also, you might face Centos 8 networking issue -- use masquerade mode
+or set docker0 to trusted (this will open all the ports published by docker):
+```sh
+$ sudo firewall-cmd --zone=public --add-masquerade --permanent
+$ sudo firewall-cmd --zone=trusted --add-interface=docker0 --permanent
+$ sudo firewall-cmd --reload
+$ sudo firewall-cmd --list-all
+```
+
 
 ### License
 ----

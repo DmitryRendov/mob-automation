@@ -79,8 +79,8 @@ services:
       - "21025-21026:21025-21026"
     volumes:
       - "~/.gog/Starbound:/starbound"
-    network_mode: host
-
+    networks:
+      - mob
 
 networks:
   mob:
