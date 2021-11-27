@@ -56,7 +56,7 @@ services:
     #tty: true
     #stdin_open: true
     network_mode: host
-    command: "steamcmd-wrapper ./7DaysToDieServer.x86_64 -logfile /dev/stdout -configfile=serverconfig.xml -quit -batchmode -nographics -dedicated"
+    command: "steamcmd-wrapper ./7DaysToDieServer.x86_64 -logfile ./Logs/myLogfile.txt -configfile=serverconfig.xml -quit -batchmode -nographics -dedicated"
     environment:
       STEAMCMD_APP_ID: "294420"
       STEAMCMD_SKIP: "true"
