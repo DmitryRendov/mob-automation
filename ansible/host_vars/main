@@ -13,7 +13,7 @@ vhosts: "{{ site_home }}/vhosts"
 site_path: "{{ vhosts }}/{{ site_name }}"
 site_repo: "git@github.com:DmitryRendov/mob-site.git"
 
-site_dump_src: "https://www.dropbox.com/s/nx25cr2j8a8evnw/mob_site_latest.dump.gz?dl=1"
+site_dump_src: ""
 site_db_name: mob_site
 site_db_dump: mob_site_latest.dump.gz
 site_db_users:
@@ -28,15 +28,15 @@ minecraft_home: /home/minecraft
 
 server_folder: /home/minecraft/mob-servers
 server_repo: "git@github.com:DmitryRendov/mob-server.git"
-server_lobby_src: https://www.dropbox.com/s/jwmprrn80xhet3u/lobby_source_relative.tar.gz?dl=1
-server_survival_src: https://www.dropbox.com/s/i6giwnxqph9il1m/survival_source.tar.gz?dl=1
-server_vanilla_src: https://www.dropbox.com/s/r0cywjvg32adltw/vanilla_source.tar.gz?dl=1
+server_lobby_src: ""
+server_survival_src: ""
+server_vanilla_src: ""
 
-server_dump_src: https://www.dropbox.com/s/wrmuny6quwmmsad/mob_server_latest.dump.gz?dl=1
+server_dump_src: ""
 server_db_name: mob_server
 server_db_dump: mob_server_latest.dump.gz
 server_db_users:
   - name: minecraft
     host: localhost
-    pass: 111
+    pass: ""
     priv: "*.*:ALL"

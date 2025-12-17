@@ -1,2 +1,0 @@
-- name: restart archiva
-  service: name=archiva state=restarted

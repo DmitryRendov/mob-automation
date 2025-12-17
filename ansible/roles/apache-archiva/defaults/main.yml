@@ -1,7 +1,0 @@
----
-ar_username: archiva
-ar_home: /mnt/archiva
-source_url: http://www-eu.apache.org/dist/archiva/2.2.0/binaries/apache-archiva-2.2.0-bin.tar.gz
-download_path: /tmp/apache-archiva-2.2.0-bin.tar.gz
-install_name: apache-archiva-2.2.0
-custom_port: 8081

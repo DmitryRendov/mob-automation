@@ -1,5 +1,5 @@
 # Setup MySQL server
-# ansible-playbook -i ./inventory/dev mysql.yml --extra-vars "env=desktop user=vagrant mysql_engine=MyISAM mysql_rootpass=Secret123" -vv -c paramiko
+# ansible-playbook -i ./inventory/dev mysql.yml --extra-vars "env=desktop user=vagrant mysql_engine=MyISAM mysql_rootpass=Secret123" -vv
 
 - hosts: "{{env}}"
   user: "{{user}}"
