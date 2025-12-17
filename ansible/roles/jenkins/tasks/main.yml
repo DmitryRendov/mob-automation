@@ -1,9 +1,0 @@
---- 
-
-- include: jenkins-install.yml
-
-- include: jenkins-configure.yml
-
-- include: ssh.yml
-
-- include: plugins.yml

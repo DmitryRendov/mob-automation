@@ -1,4 +1,4 @@
-# MOB CI/CD repo
+# Private Automation repo
 
 This is CI/CD repo for MOB project, which includes main server roles like:
 - Ansible master

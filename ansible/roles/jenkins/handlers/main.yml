@@ -1,8 +1,0 @@
-- name: jenkins restart
-  service: name=jenkins state=restarted
-
-- name: jenkins reload configuration
-  command: java -jar {{jenkins_home}}/jenkins-cli.jar -s {{jenkins_url}}{{jenkins_prefix}} reload-configuration
-  become: yes
-  become_user: "{{ jenkins_user }}"
-  become_method: sudo

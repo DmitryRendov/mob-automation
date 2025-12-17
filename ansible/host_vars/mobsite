@@ -13,7 +13,7 @@ vhosts: "{{ site_home }}/vhosts"
 site_path: "{{ vhosts }}/{{site_name}}"
 site_repo: "git@github.com:DmitryRendov/mob-site.git"
 
-site_dump_src: "https://www.dropbox.com/s/nx25cr2j8a8evnw/mob_site_latest.dump.gz?dl=1"
+site_dump_src: ""
 site_db_name: mob_site
 site_db_dump: mob_site_latest.dump.gz
 site_db_users:

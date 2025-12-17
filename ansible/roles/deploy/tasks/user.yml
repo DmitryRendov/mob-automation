@@ -1,4 +1,0 @@
----
-
-- name: Create a new user for MOB
-  user: name={{ ar_username }} shell=/bin/bash home={{ ar_home }} comment="Archiva User" uid=1040 

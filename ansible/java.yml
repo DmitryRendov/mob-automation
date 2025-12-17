@@ -1,6 +1,6 @@
-# Set java 7/8 to servers
+# Setup Java
 #
-# ansible-playbook -i ./inventory/dev java.yml --extra-vars "env=mobsite-dev java_version=1.8 user=vagrant" -vv
+# ansible-playbook -i ./inventory/dev java.yml --extra-vars "env=mobsite-dev java_version=21 user=minecraft" -vv
 
 - hosts: "{{env}}"
   user: "{{user}}"
@@ -10,6 +10,4 @@
   max_fail_percentage: 0
 
   roles:
-    - { role: java1.8-oracle-debian, when: ansible_os_family == "Debian" and java_version == "1.8"}
-    - { role: java1.7-centos, when: ansible_os_family == "CentOS" and java_version == "1.7" }
-    - { role: java1.7-debian, when: ansible_os_family == "Debian" and java_version == "1.7" }
+    - java-oracle
