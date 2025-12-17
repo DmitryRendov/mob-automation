@@ -1,8 +1,8 @@
-# setup common system applications and configure Ansible node
-# ansible-playbook -i ./inventory/dev common.yml --extra-vars "env=mobsite-dev user=vagrant env_type=prod" -vv
+# setup common system applications
+# ansible-playbook -i ./inventory/dev common.yml --extra-vars "env=mobserver user=minecraft env=prod" -vv
 
-- hosts: "{{env}}"
-  user: "{{user}}"
+- hosts: "{{ env }}"
+  user: "{{ user }}"
   become: yes
   become_method: sudo
   gather_facts: true

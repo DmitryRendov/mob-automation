@@ -1,0 +1,85 @@
+---
+- name: Install OpenSSH client and server
+  apt:
+    name:
+      - openssh-client
+      - openssh-server
+    state: present
+    update_cache: yes
+
+- name: verify users group exists
+  group:
+    name: users
+    state: present
+
+- name: Create a minecraft user
+  user:
+    name: "{{ user }}"
+    state: present
+    group: users
+    create_home: yes
+    shell: /bin/bash
+
+- name: Add minecraft user to sudo group
+  user:
+    name: "{{ user }}"
+    groups: sudo
+    append: yes
+
+- name: Configure sudoers for sudo group to not require password
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: Ensure SSH directory exists for {{ user }} user
+  file:
+    path: "/home/{{ user }}/.ssh"
+    state: directory
+    owner: "{{ user }}"
+    group: users
+    mode: '0700'
+
+- name: Copy pre-defined authorized_keys to the {{ user }} user
+  authorized_key:
+    key: "{{ ansible_ssh_key | join('\n') }}"
+    user: "{{ user }}"
+    state: present
+
+- name: Configure SSH to use custom port
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?Port'
+    line: "Port {{ ansible_port | default(22) }}"
+    state: present
+  notify: restart sshd
+
+- name: Disable password authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+    state: present
+  notify: restart sshd
+
+- name: Disable challenge-response authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?ChallengeResponseAuthentication'
+    line: 'ChallengeResponseAuthentication no'
+    state: present
+  notify: restart sshd
+
+- name: Ensure PubkeyAuthentication is enabled
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PubkeyAuthentication'
+    line: 'PubkeyAuthentication yes'
+    state: present
+  notify: restart sshd
+
+- name: Validate SSH configuration
+  command: sshd -t
+  changed_when: false
