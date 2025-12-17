@@ -82,5 +82,17 @@ services:
     networks:
       - mob
 
+  enshrouded:
+    image: enshrouded
+    environment:
+      USER_UID: "1000"
+      USER_GID: "1000"
+    ports:
+      - "15636-15637:15636-15637"
+    volumes:
+      - "~/.steam/enshrouded:/enshrouded"
+    networks:
+      - mob
+
 networks:
   mob:
