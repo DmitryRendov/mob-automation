@@ -1,47 +1,9 @@
 ---
 
-- name: Installing common applications by APT
-  apt: pkg={{item}} state=present
-  with_items:
-    - screen
-    - htop
-    - sudo
-    - iftop
-    - iotop
-    - mc
-    - vim
-    - fail2ban
-    - zip
-    - lynx
-
-# In case of vagrant isnt set additions
-# sudo apt-get install build-essential module-assistant dkms
-# mount /dev/cdrom /media/cdrom
-# cd /media/cdrom && sh ./VBoxLinuxAdditions.run
-
-- name: Ensure required packages are installed.
-  apt: pkg={{item}} state=present update_cache=yes
-  with_items: "{{ packages }}"
-  when: ansible_os_family == "Debian" and env_type == "dev"
-
-- shell: uname -r
-  ignore_errors: yes
-  register: uname_result
-  when: ansible_os_family == "Debian" and env_type == "dev"
-
-- apt: pkg=linux-headers-{{ uname_result.stdout }} state=present
-  when: ansible_os_family == "Debian" and env_type == "dev"
-
-- name: Set hostname
-  template: src=hostname.j2 dest=/etc/hostname mode=644
-  register: sethostname
-
-- name: set temp hostname variable
-  shell: hostname {{ inventory_hostname_short }}
-  when: sethostname |changed
-
-- name: add hostname to local host file
-  lineinfile: dest=/etc/hosts line='127.0.0.1 {{ inventory_hostname_short }}'
+# - name: Installing common applications by APT
+#   apt: pkg={{ item }} state=present
+#   with_items:
+#     - "{{ packages }}"
 
 - name: Set bash config
   template: src=.bashrc.j2 dest=/home/{{user}}/.bashrc
@@ -49,10 +11,13 @@
 - name: Set root bash config
   template: src=.bashrc.j2 dest=/root/.bashrc
 
-- name: Set vim config
-  template: src=vimrc.j2 dest=/etc/vimrc
-
 - name: Add ssh key for authentication
-  authorized_key: key="{{item}}" user="{{user}}"
+  authorized_key: key="{{ item }}" user="{{ user }}"
   with_items:
     - "{{ ansible_ssh_key }}"
+
+- name: Include sshd configuration
+  include_tasks: sshd.yml
+
+- name: Include firewall configuration
+  include_tasks: firewall.yml

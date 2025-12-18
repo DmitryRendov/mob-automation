@@ -1,3 +1,8 @@
-- name: restart ntp
-  service: name=ntp state=restarted
-  when: ansible_os_family == "Debian"
+- name: restart sshd
+  service: name=sshd state=restarted  
+
+- name: restart ufw service
+  service: name=ufw state=restarted
+
+- name: restart fail2ban service
+  service: name=fail2ban state=restarted

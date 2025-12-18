@@ -1,6 +1,6 @@
 # Set up and configure Apache2 to server
 #
-# ansible-playbook -i ./inventory/dev apache2.yml --extra-vars "env=mobsite-dev user=vagrant" -vv -c paramiko
+# ansible-playbook -i ./inventory/dev apache2.yml --extra-vars "env=mobsite-dev user=minecraft" -vv
 
 - hosts: "{{env}}"
   user: "{{user}}"

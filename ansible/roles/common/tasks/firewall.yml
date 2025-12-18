@@ -1,0 +1,69 @@
+- name: Ensure UFW is installed
+  apt: name=ufw state=present
+
+- name: Allow SSH access first (prevent lockout)
+  ufw:
+    rule: allow
+    port: "{{ ansible_ssh_port | default('22') }}"
+    proto: tcp
+    comment: 'SSH access'
+
+- name: Configure UFW to allow custom ports
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items: "{{ custom_allowed_ports }}"
+
+- name: Create a Minecraft xml service ufw profile
+  copy:
+    dest: /etc/ufw/applications.d/minecraft
+    content: |
+      [minecraft]
+      title=MOB Minecraft Server
+      description=MOB Minecraft Server Port
+      ports=25565/tcp
+  notify: restart ufw service
+    
+- name: Enable UFW
+  ufw:
+    state: enabled
+    logging: 'on'
+    default: deny
+    direction: incoming
+
+- name: Ensure fail2ban is installed
+  apt: name=fail2ban state=present
+
+- name: Ensure fail2ban service is running and enabled
+  service: name=fail2ban state=started enabled=yes
+
+- name: Copy fail2ban local configuration
+  copy:
+    dest: /etc/fail2ban/jail.local
+    content: |
+      [DEFAULT]
+      bantime = 3600
+      findtime = 600
+      maxretry = 5
+      backend = auto
+      ignoreip = 127.0.0.1/8 ::1 51.254.133.16/32
+
+- name: Ensure fail2ban jail.d directory exists
+  file:
+    path: /etc/fail2ban/jail.d
+    state: directory
+    mode: '0755'
+
+- name: Copy fail2ban jail configuration for ssh
+  copy:
+    dest: /etc/fail2ban/jail.d/sshd.conf
+    content: |
+      [sshd]
+      enabled = true
+      port    = {{ ansible_ssh_port | default(22) }}
+      filter  = sshd
+      logpath = /var/log/auth.log
+      maxretry = 5
+  notify: restart fail2ban service  
+

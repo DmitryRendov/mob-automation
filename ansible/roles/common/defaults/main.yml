@@ -1,5 +1,35 @@
 ---
 
-env_type: "dev"
-packages: [dkms, build-essential]
+ansible_ssh_key: 
+  - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFtzcxdPSMZYg2jutiuS8Nvt/VzjY6t6kWZyJf7kjSAm drendov+ovh@gmail.com'
+
+custom_allowed_ports:
+    - 50223
+    - 80
+    - 443
+
+packages: 
+    - screen
+    - htop
+    - sudo
+    - iftop
+    - iotop
+    - mc
+    - vim
+    - zip
+    - ufw
+    - fail2ban
+    - git
+    - curl
+    - wget
+    - ca-certificates
+    - apt-transport-https
+    - software-properties-common
+    - build-essential
+    - linux-headers-generic
+    - python3-pip
+    - python3-venv
+    - python3-dev
+    - libssl-dev
+    
 
