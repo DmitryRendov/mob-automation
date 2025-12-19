@@ -1,0 +1,13 @@
+# Setup Java
+#
+# ansible-playbook -i ./inventory/live java.yml --extra-vars "user=minecraft env=mobserver-vps" -v
+
+- hosts: "{{ env }}"
+  user: "{{ user }}"
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  max_fail_percentage: 0
+
+  roles:
+    - java-oracle
