@@ -1,0 +1,10 @@
+---
+
+- name: Include git setup and configuration
+  include_tasks: git.yml
+
+- name: Include aws setup and configuration
+  include_tasks: aws.yml
+
+- name: Include wireguard setup and configuration
+  include_tasks: wireguard.yml

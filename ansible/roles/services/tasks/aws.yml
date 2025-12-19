@@ -1,0 +1,78 @@
+---
+- name: Check if AWS CLI is installed
+  command: aws --version
+  register: aws_cli_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Download AWS CLI v2
+  ansible.builtin.command:
+    cmd: "curl -sL https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o /tmp/awscliv2.zip"
+    creates: "/tmp/awscliv2.zip"
+  when: aws_cli_check.rc != 0
+
+- name: Unzip AWS CLI v2
+  ansible.builtin.unarchive:
+    src: "/tmp/awscliv2.zip"
+    dest: "/tmp"
+    remote_src: yes
+    creates: "/tmp/aws/install"
+  when: aws_cli_check.rc != 0
+
+- name: Install AWS CLI v2
+  ansible.builtin.command:
+    cmd: "/tmp/aws/install"
+    creates: "/usr/local/bin/aws"
+  become: yes
+  when: aws_cli_check.rc != 0
+
+- name: Create .aws directory
+  file:
+    path: "/home/{{ user }}/.aws"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0755'
+
+- name: Create AWS config file
+  copy:
+    content: |
+      [default]
+      region = {{ aws_region | default('us-east-1') }}
+      output = json
+    dest: "/home/{{ user }}/.aws/config"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0644'
+
+- name: Create AWS credentials file
+  copy:
+    content: |
+      [default]
+      aws_access_key_id = {{ aws.access_key }}
+      aws_secret_access_key = {{ aws.secret_key }}
+    dest: "/home/{{ user }}/.aws/credentials"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0600'
+  no_log: yes
+
+- name: Validate AWS CLI is working
+  command: aws --version
+  become_user: "{{ user }}"
+  register: aws_validation
+  changed_when: false
+
+- name: Display AWS validation result
+  debug:
+    msg: "AWS CLI is working. Version: {{ aws_validation.stdout }}"
+
+- name: Clean up AWS CLI installation files
+  file:
+    path: "/tmp/awscliv2.zip"
+    state: absent
+
+- name: Remove AWS CLI installation directory
+  file:
+    path: "/tmp/aws"
+    state: absent

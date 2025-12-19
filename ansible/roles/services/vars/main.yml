@@ -1,0 +1,15 @@
+---
+
+wireguard:
+  server_public_key: ""
+  server_private_key: ""
+
+aws:
+  access_key: ""
+  secret_key: ""
+
+git:
+  username: ""
+  email: ""
+  ssh_key_name: ""
+  ssh_key: ""

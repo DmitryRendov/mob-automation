@@ -1,0 +1,6 @@
+---
+
+wg_server_network: "10.10.10.1/24"
+wg_server_port: 51821
+wg_allowed_ip: "10.10.10.0/24"
+

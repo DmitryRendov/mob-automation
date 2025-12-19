@@ -1,0 +1,12 @@
+# Configure supportive services and integrations - git, aws, wireguard, etc.
+#
+# ansible-playbook -i ./inventory/live services.yml -e "user=minecraft env=mobserver-vps" -e "@local.vars.yml" -v
+
+- hosts: "{{ env }}"
+  user: "{{ user }}"
+  become: yes
+  become_method: sudo
+  gather_facts: true
+
+  roles:
+    - services
