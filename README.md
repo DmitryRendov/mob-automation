@@ -21,8 +21,9 @@ $ cd mob-automation/ansible
 Install common packages, MySQL, and Java:
 
 ```sh
-$ ansible-playbook -i ./inventory/live common.yml --extra-vars "user=minecraft env=mobserver-vps" -vv
-$ ansible-playbook -i ./inventory/live java.yml --extra-vars "user=minecraft env=mobserver-vps" -v
+$ ansible-playbook -i ./inventory/live common.yml --extra-vars "user=minecraft env=mobserver-vps" -v
+$ ansible-playbook -i ./inventory/live services.yml --extra-vars "user=minecraft env=mobserver-vps" -v
+$ ansible-playbook -i ./inventory/live java-oracle.yml --extra-vars "user=minecraft env=mobserver-vps" -v
 $ ansible-playbook -i ./inventory/live mysql.yml --extra-vars "user=minecraft env=mobserver-vps password=Secret_DB_Pass" -v
 ```
 

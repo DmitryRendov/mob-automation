@@ -1,0 +1,70 @@
+---
+- name: Check if git is installed
+  ansible.builtin.command: which git
+  register: git_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Install git
+  ansible.builtin.apt:
+    name: git
+    state: present
+    update_cache: yes
+  become: yes
+  when: git_check.rc != 0
+
+- name: Ensure .git directory exists in user home
+  ansible.builtin.file:
+    path: "/home/{{ user }}/.git"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0755'
+
+- name: Configure SSH to use git key for GitHub/GitLab
+  ansible.builtin.blockinfile:
+    path: "/home/{{ user }}/.ssh/config"
+    create: yes
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0600'
+    block: |
+      Host github.com
+        HostName github.com
+        User git
+        IdentityFile ~/.ssh/{{ git.ssh_key_name }}
+        StrictHostKeyChecking no
+        UserKnownHostsFile /dev/null
+
+- name: Configure global git username
+  ansible.builtin.git_config:
+    name: user.name
+    value: "{{ git.username }}"
+    scope: global
+  become: yes
+  become_user: "{{ user }}"
+
+- name: Configure global git email
+  ansible.builtin.git_config:
+    name: user.email
+    value: "{{ git.email }}"
+    scope: global
+  become: yes
+  become_user: "{{ user }}"
+
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: "/home/{{ user }}/.ssh"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0700'
+
+- name: Copy git SSH private key
+  ansible.builtin.copy:
+    content: "{{ git.ssh_key }}"
+    dest: "/home/{{ user }}/.ssh/{{ git.ssh_key_name }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: '0600'
+

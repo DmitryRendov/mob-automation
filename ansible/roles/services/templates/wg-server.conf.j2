@@ -1,0 +1,9 @@
+[Interface]
+Address = {{ server_network }}
+PrivateKey = {{ server_private_key }}
+ListenPort = {{ wg_server_port }}
+
+[Peer]
+PublicKey = {{ client_public_key }}
+AllowedIPs = {{ allowed_ip }}
+PersistentKeepalive = 25

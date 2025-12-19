@@ -1,0 +1,107 @@
+---
+# WireGuard Server Configuration
+
+- name: Install WireGuard
+  ansible.builtin.apt:
+    name: wireguard
+    state: present
+    update_cache: yes
+
+- name: Enable IP forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Create WireGuard configuration directory
+  ansible.builtin.file:
+    path: /etc/wireguard
+    state: directory
+    mode: '0700'
+
+- name: Deploy WireGuard server configuration
+  ansible.builtin.template:
+    src: wg-server.conf.j2
+    dest: /etc/wireguard/wg0.conf
+    mode: '0600'
+  vars:
+    server_private_key: "{{ wireguard.server_private_key }}"
+    client_public_key: "{{ wireguard.client_public_key }}"
+    server_network: "{{ wg_server_network | default('10.10.10.1/24') }}"
+    allowed_ip: "{{ wg_allowed_ip | default('10.10.10.0/24') }}"
+    server_port: "{{ wg_server_port | default(51821) }}"
+  notify: restart wireguard
+
+- name: Enable and start WireGuard service
+  ansible.builtin.systemd:
+    name: wg-quick@wg0
+    enabled: yes
+    state: started
+
+- name: Wait for WireGuard interface to be up
+  ansible.builtin.wait_for:
+    path: /sys/class/net/wg0
+    state: present
+    timeout: 10
+
+- name: Check WireGuard service status
+  ansible.builtin.systemd:
+    name: wg-quick@wg0
+  register: wg_service_status
+
+- name: Verify WireGuard service is running
+  ansible.builtin.assert:
+    that:
+      - wg_service_status.status.ActiveState == "active"
+    fail_msg: "WireGuard service is not running properly"
+    success_msg: "WireGuard service is active and running"
+
+- name: Get WireGuard interface information
+  ansible.builtin.command: wg show wg0
+  register: wg_interface
+  changed_when: false
+
+- name: Display WireGuard interface status
+  ansible.builtin.debug:
+    msg: "{{ wg_interface.stdout_lines }}"
+
+- name: Verify WireGuard interface configuration
+  ansible.builtin.command: ip addr show wg0
+  register: wg_ip_addr
+  changed_when: false
+
+- name: Check WireGuard interface has correct IP
+  ansible.builtin.assert:
+    that:
+      - "'{{ wg_server_network }}' in wg_ip_addr.stdout"
+    fail_msg: "WireGuard interface does not have the correct IP address"
+    success_msg: "WireGuard interface configured with {{ wg_server_network }}"
+
+- name: Create a WireGuard xml service ufw profile
+  copy:
+    dest: /etc/ufw/applications.d/wireguard
+    content: |
+      [wireguard]
+      title=WireGuard VPN
+      description=WireGuard VPN Port
+      ports={{ wg_server_port }}/udp
+
+- name: Allow WireGuard through UFW
+  community.general.ufw:
+    rule: allow
+    name: wireguard
+  notify: restart ufw service
+
+- name: Get WireGuard peer information
+  ansible.builtin.shell: wg show wg0 peers
+  register: wg_peers
+  changed_when: false
+
+- name: Verify peer is configured
+  ansible.builtin.assert:
+    that:
+      - wg_peers.stdout | length > 0
+    fail_msg: "No peers configured"
+    success_msg: "Peer(s) configured successfully"
