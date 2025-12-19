@@ -1,0 +1,56 @@
+---
+
+  - name: Check If java is already installed or not
+    shell: "java -version 2>&1 | grep version | awk '{print $3}' | sed 's/\"//g'"
+    register: java_version
+    ignore_errors: yes
+
+  - name: Installed java version
+    debug: "msg={{java_version.stdout}}"
+    when: java_version.rc == 0
+
+  - name: Download Java package from Oracle
+    command: "wget -q -O {{java_archive}} --no-check-certificate --no-cookies --header 'Cookie: oraclelicense=accept-securebackup-cookie' {{download_url}}"
+    args:
+      creates: "{{java_archive}}"
+
+  - name: Extract Java package
+    unarchive:
+      src: "{{java_archive}}"
+      dest: "{{download_folder}}"
+      remote_src: yes
+      creates: "{{java_name}}"
+
+  - name: Fix ownership of Java folder
+    file:  
+      path: "{{java_name}}"
+      owner: root
+      group: root
+      recurse: yes
+
+  - name: Set Java alternatives
+    alternatives:
+      name: java
+      link: /usr/bin/java
+      path: "{{java_name}}/bin/java"  
+
+  - name: Set Javac alternatives
+    alternatives:
+      name: javac
+      link: /usr/bin/javac
+      path: "{{java_name}}/bin/javac"
+
+  - name: Set Java Home environment variable
+    lineinfile:
+      path: /etc/environment
+      regexp: '^JAVA_HOME='
+      line: "JAVA_HOME={{java_name}}"
+      state: present
+      create: yes
+    notify: Reload environment variables
+
+  - name: Clean up
+    file:
+      state: absent
+      path: "{{java_archive}}"
+    

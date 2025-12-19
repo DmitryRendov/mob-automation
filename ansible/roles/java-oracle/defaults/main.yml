@@ -1,0 +1,7 @@
+---
+# Default variables for java-oracle role
+
+download_url: https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.tar.gz
+download_folder: /opt
+java_name: "{{download_folder}}/jdk-21.0.9"
+java_archive: "{{download_folder}}/jdk-21_linux-x64_bin.tar.gz"
