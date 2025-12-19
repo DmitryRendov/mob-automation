@@ -1,7 +1,7 @@
 ---
 
 wireguard:
-  server_public_key: ""
+  client_public_key: ""
   server_private_key: ""
 
 aws:
