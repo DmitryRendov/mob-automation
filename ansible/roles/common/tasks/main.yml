@@ -1,9 +1,9 @@
 ---
 
-# - name: Installing common applications by APT
-#   apt: pkg={{ item }} state=present
-#   with_items:
-#     - "{{ packages }}"
+- name: Installing common applications by APT
+  apt: pkg={{ item }} state=present
+  with_items:
+    - "{{ packages }}"
 
 - name: Set bash config
   template: src=.bashrc.j2 dest=/home/{{user}}/.bashrc

@@ -43,7 +43,7 @@ git:
 
 ```bash
 ansible-playbook -i ./inventory/live services.yml \
--e "user=minecraft env=mobserver-vps" \
+-e "user=minecraft env=mobserver-vps wireguard_enabled=true" \
 -e "@local.vars.yml" -v
 ```
 

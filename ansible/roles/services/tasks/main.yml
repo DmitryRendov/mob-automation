@@ -8,3 +8,4 @@
 
 - name: Include wireguard setup and configuration
   include_tasks: wireguard.yml
+  when: wireguard_enabled | default(false)
