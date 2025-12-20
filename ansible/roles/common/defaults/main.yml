@@ -1,6 +1,6 @@
 ---
 
-ansible_ssh_key: 
+ansible_ssh_key:
   - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFtzcxdPSMZYg2jutiuS8Nvt/VzjY6t6kWZyJf7kjSAm drendov+ovh@gmail.com'
 
 custom_allowed_ports:
@@ -8,7 +8,7 @@ custom_allowed_ports:
     - 80
     - 443
 
-packages: 
+packages:
     - screen
     - htop
     - sudo
@@ -22,6 +22,7 @@ packages:
     - git
     - curl
     - wget
+    - unzip
     - ca-certificates
     - apt-transport-https
     - software-properties-common
@@ -31,5 +32,5 @@ packages:
     - python3-venv
     - python3-dev
     - libssl-dev
-    
+
 
