@@ -1,0 +1,64 @@
+---
+
+- name: Configure max_connections
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^#?max_connections\s*='
+    line: "max_connections = {{ mariadb_max_connections }}"
+    insertafter: '^\[mysqld\]'
+  notify: restart mariadb
+
+- name: Configure max_allowed_packet
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^#?max_allowed_packet\s*='
+    line: "max_allowed_packet = {{ mariadb_max_allowed_packet }}"
+    insertafter: '^#?max_connections'
+  notify: restart mariadb
+
+- name: Configure thread_cache_size
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^#?thread_cache_size\s*='
+    line: "thread_cache_size = {{ mariadb_thread_cache_size }}"
+    insertafter: '^#?thread_stack'
+  notify: restart mariadb
+
+- name: Configure wait_timeout
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^#?wait_timeout\s*='
+    line: "wait_timeout = {{ mariadb_wait_timeout }}"
+    insertafter: '^\[mysqld\]'
+  notify: restart mariadb
+
+- name: Configure connect_timeout
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^#?connect_timeout\s*='
+    line: "connect_timeout = {{ mariadb_connect_timeout }}"
+    insertafter: '^\[mysqld\]'
+  notify: restart mariadb
+
+- name: Enable skip-name-resolve
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^#?skip-name-resolve'
+    line: "skip-name-resolve"
+    insertafter: '^#?skip-name-resolve'
+  notify: restart mariadb
+  when: mariadb_skip_name_resolve | default(false)
+
+- name: Configure character-set-server (already exists, ensure correct value)
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^character-set-server\s*='
+    line: "character-set-server = {{ mariadb_character_set }}"
+  notify: restart mariadb
+
+- name: Configure collation-server (already exists, ensure correct value)
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^collation-server\s*='
+    line: "collation-server = {{ mariadb_collation }}"
+  notify: restart mariadb

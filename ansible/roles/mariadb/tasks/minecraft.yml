@@ -1,0 +1,28 @@
+- name: Create mob_server database
+  mysql_db:
+    name: "{{ minecraft_db_name }}"
+    encoding: utf8
+    collation: utf8_general_ci
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create minecraft database user for localhost
+  mysql_user:
+    name: "{{ minecraft_db_user }}"
+    password: "{{ minecraft_db_password }}"
+    priv: "{{ minecraft_db_name }}.*:ALL"
+    host: localhost
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  no_log: yes
+
+- name: Create minecraft database user for allowed networks
+  mysql_user:
+    name: "{{ minecraft_db_user }}"
+    password: "{{ minecraft_db_password }}"
+    priv: "{{ minecraft_db_name }}.*:ALL"
+    host: "{{ item }}"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  loop: "{{ allowed_networks }}"
+  no_log: yes

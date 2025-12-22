@@ -1,0 +1,44 @@
+---
+
+- name: Check if MariaDB is already installed
+  stat:
+    path: /usr/sbin/mysqld
+  register: mariadb_installed
+  ignore_errors: yes
+
+- name: Install MariaDB if not already installed
+  apt:
+    name:
+      - mariadb-server
+      - mariadb-client
+      - mariadb-common
+      - mysql-common
+      - python3-pymysql
+    state: present
+    update_cache: yes
+  when: not mariadb_installed.stat.exists
+
+- name: Restart MariaDB after installation
+  service:
+    name: mariadb
+    state: restarted
+
+- name: Ensure MariaDB is running and enabled
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- include_tasks: secure.yml
+
+- include_tasks: fine-tunning.yml
+
+- include_tasks: minecraft.yml
+
+- include_tasks: disable-sock.yml
+  when: mysql_disable_unix_socket_auth
+
+- name: Restart MariaDB after installation
+  service:
+    name: mariadb
+    state: restarted
