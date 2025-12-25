@@ -9,12 +9,12 @@
 
 - include: configure.yml
 
-- include: worlds.yml
-  when: mode == "setup" or mode == "reset"
+# - include: worlds.yml
+#   when: mode == "setup" or mode == "reset"
 
-- include: database.yml
-  when: mode == "setup"
+# - include: database.yml
+#   when: mode == "setup"
 
-- include: services.yml
-  when: mode == "setup"
+# - include: services.yml
+#   when: mode == "setup"
 

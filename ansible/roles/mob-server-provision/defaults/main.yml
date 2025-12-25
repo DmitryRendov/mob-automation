@@ -1,12 +1,19 @@
 temp_folder: /tmp
 
+packages:
+  - screen
+  - git
+
 # Minecraft server configuration
 # Available modes: setup, update, reset
 # -setup: fresh installation
 # -update: update existing installation
 # -reset: reset worlds to default   
 # Default: setup
-mode: setup
+mode: update
+environment: dev
+
+server_version: 1.21.1
 
 minecraft_user: minecraft
 minecraft_group: minecraft
@@ -14,25 +21,56 @@ server_repo: "git@github.com:DmitryRendov/mob-server.git"
 
 minecraft_home: /home/minecraft
 server_folder: "{{ minecraft_home }}/mob-servers"
+backup_folder: "{{ minecraft_home }}/backups/worlds"
+
+# Server resources allocation
+servers_configuration:
+  dev: 
+    bungeecord: 
+      memory: 512M
+      cpus: 1
+    lobby:
+      memory: 1G
+      cpus: 1
+    survival:
+      memory: 2G
+      cpus: 2
+    vanilla:
+      memory: 1G
+      cpus: 1
+  prod:
+    bungeecord: 
+      memory: 1G
+      cpus: 1
+    lobby:
+      memory: 2G
+      cpus: 2
+    survival:
+      memory: 4G
+      cpus: 4
+    vanilla:
+      memory: 2G
+      cpus: 2
+
 
 # Minecraft database configuration
 minecraft_db_name: mob_server
 minecraft_db_user: minecraft
 minecraft_db_src:
  - bucket: mob-server-backups
-   object: dev/1.21.1/latest/survival.dump.tar.gz
+   object: {{ environment }}/{{ server_version }}/latest/survival.dump.tar.gz
 
 # Server region sources URLs
 server_src:
   lobby:
    - bucket: mob-server-backups
-     object: dev/1.21.1/latest/lobby.tar.gz
+     object: {{ environment }}/{{ server_version }}/latest/lobby.tar.gz
   survival:
    - bucket: mob-server-backups
-     object: dev/1.21.1/latest/survival.tar.gz
+     object: {{ environment }}/{{ server_version }}/latest/survival.tar.gz
   vanilla:
    - bucket: mob-server-backups
-     object: dev/1.21.1/latest/vanilla.tar.gz
+     object: {{ environment }}/{{ server_version }}/latest/vanilla.tar.gz
 
 service_restart_cooldown: 10
 service_stop_cooldown: 10

@@ -13,18 +13,18 @@
 ### END INIT INFO
  
 # Settings
-SERVICE='paper-survival-1.21.1.jar'
-OPTIONS='nogui' #--forceUpgrade'
+SERVICE='paper-survival-{{ server_version }}.jar'
+OPTIONS='--nogui'
 USERNAME='minecraft'
 SCREENNAME='survival'
 WORLD='survival'
-MCPATH='/home/minecraft/mob-servers/survival'
-BACKUPPATH='/home/minecraft/backups/worlds'
-MAXHEAP=8192
-MINHEAP=8192
+MCPATH='{{ server_folder }}/survival'
+BACKUPPATH='{{ backup_folder }}'
+MAXHEAP={{ servers_configuration.survival.memory }}
+MINHEAP={{ servers_configuration.survival.memory }}
 HISTORY=1024
-CPU_COUNT=4
-INVOCATION="java -Xmx${MAXHEAP}M -Xms${MINHEAP}M -XX:ParallelGCThreads=$CPU_COUNT \
+CPU_COUNT={{ servers_configuration.survival.cpus }}
+INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} -XX:ParallelGCThreads=$CPU_COUNT \
 -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=50 \
 -XX:+DisableExplicitGC -XX:SurvivorRatio=32 -XX:G1NewSizePercent=30 \
 -XX:G1MaxNewSizePercent=50 -XX:InitiatingHeapOccupancyPercent=15 -XX:+AlwaysPreTouch \
@@ -55,35 +55,44 @@ D2BACKUP[16]='plugins/GPFlags/flags.yml'
 D2BACKUP[17]='plugins/ChestShop/items.db'
 D2BACKUP[18]='plugins/ChestShop/users.db'
 
-ME=`whoami`
+ME=$(whoami)
 as_user() {
-  if [ $ME == $USERNAME ] ; then
+  if [ "$ME" = "$USERNAME" ] ; then
     bash -c "$1"
   else
-    su - $USERNAME -c "$1"
+    su -s /bin/bash - "$USERNAME" -c "$1"
   fi
 }
 
+is_running() {
+  pgrep -u "$USERNAME" -f "$SERVICE" > /dev/null 2>&1
+}
+
 mc_start() {
-  if  pgrep -u $USERNAME -f $SERVICE > /dev/null
+  if is_running
   then
     echo "$SERVICE is already running!"
+    return 0
   else
     echo "Starting $SERVICE..."
-    cd $MCPATH
-    as_user "cd $MCPATH && screen -h $HISTORY -dmS $SCREENNAME $INVOCATION"
-    sleep 7
-    if pgrep -u $USERNAME -f $SERVICE > /dev/null
-    then
-      echo "$SERVICE is now running."
-    else
-      echo "Error! Could not start $SERVICE!"
-    fi
+    as_user "cd '$MCPATH' && screen -h $HISTORY -dmS $SCREENNAME $INVOCATION"
+    
+    # Wait up to 20 seconds for service to start (larger server)
+    for i in {1..20}; do
+      sleep 1
+      if is_running; then
+        echo "$SERVICE is now running."
+        return 0
+      fi
+    done
+    
+    echo "Error! Could not start $SERVICE!"
+    return 1
   fi
 }
 
 mc_stop() {
-  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  if is_running
   then
     echo "Stopping $SERVICE"
     as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"say Сервер БУДЕТ ВЫКЛЮЧЕН через 10 секунд. Сохраняем мир...\"\015'"
@@ -92,20 +101,26 @@ mc_stop() {
     as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"save-all\"\015'"
     sleep 3
     as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"stop\"\015'"
-    sleep 7
+    
+    # Wait up to 25 seconds for graceful shutdown (larger server)
+    for i in {1..25}; do
+      sleep 1
+      if ! is_running; then
+        echo "$SERVICE is stopped."
+        return 0
+      fi
+    done
+    
+    echo "Error! $SERVICE could not be stopped gracefully."
+    return 1
   else
     echo "$SERVICE was not running."
-  fi
-  if pgrep -u $USERNAME -f $SERVICE > /dev/null
-  then
-    echo "Error! $SERVICE could not be stopped."
-  else
-    echo "$SERVICE is stopped."
+    return 0
   fi
 }
 
 mc_saveoff() {
-  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  if is_running
   then
     echo ""
     echo "$SERVICE is running... suspending saves"
@@ -120,7 +135,7 @@ mc_saveoff() {
 }
 
 mc_saveon() {
-  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  if is_running
   then
     echo ""
     echo "$SERVICE is running... re-enabling saves"
@@ -136,24 +151,24 @@ mc_backup() {
    mc_saveoff
 
    umask 077
-   NOW=`date "+%Y-%m-%d_%Hh%M"`
+   NOW=$(date "+%Y-%m-%d_%Hh%M")
    BACKUP_FILE="$BACKUPPATH/${WORLD}_${NOW}.tar.gz"
    BACKUP_FOLDER="$BACKUPPATH/${WORLD}_${NOW}"
 
    echo ""
-   echo "Removing old backcopies..."
+   echo "Removing old backups..."
    echo ""
-   find $BACKUPPATH/*.gz -mtime +14 -exec rm {} \;
+   find "$BACKUPPATH" -name "*.gz" -mtime +14 -exec rm {} \;
 
    echo ""
    echo "Creating TEMP backup folder"
    echo ""
-   mkdir $BACKUP_FOLDER
+   mkdir "$BACKUP_FOLDER"
 
    echo ""
    echo "Backup of the server database..."
    echo ""
-   mysqldump -u minecraft -p'hg@92gS27fDs6' -h localhost mob_server | gzip -9 > "${BACKUPPATH}/mob_server_${NOW}.dump.gz"
+   mysqldump -u minecraft -p'{{ minecraft_db_password }}' -h localhost mob_server | gzip -9 > "${BACKUPPATH}/mob_server_${NOW}.dump.gz"
 
    echo ""
    echo "Backing up Survival world Safe zone..."
@@ -204,7 +219,7 @@ mc_backup() {
 mc_backup_dynmap() {
 
    umask 077
-   NOW=`date "+%Y-%m-%d_%Hh%M"`
+   NOW=$(date "+%Y-%m-%d_%Hh%M")
    BACKUP_FILE="$BACKUPPATH/${WORLD}_dynmap_${NOW}.tar"
    DYNMAP_FOLDER="plugins/dynmap/web/tiles/survival"
 
@@ -261,8 +276,8 @@ mc_backup_dynmap() {
 mc_backup_user() {
 
    umask 077
-   UUID="$1";
-   NOW=`date "+%Y-%m-%d_%Hh%M"`
+   UUID="$1"
+   NOW=$(date "+%Y-%m-%d_%Hh%M")
    BACKUP_FILE="/home/minecraft/backups/users/${UUID}_${NOW}.tar"
    U2BACKUP[0]="plugins/Essentials/userdata/${UUID}.yml"
    U2BACKUP[1]="survival/advancements/${UUID}.json"
@@ -276,7 +291,7 @@ mc_backup_user() {
    for object in ${U2BACKUP[*]}
    do
       echo ""
-      echo -n "Backuping ${object}"
+      echo -n "Backing up ${object}"
       as_user "tar -C \"$MCPATH\" -rf \"$BACKUP_FILE\" $object"
    done
 
@@ -288,15 +303,18 @@ mc_backup_user() {
 }
 
 mc_command() {
-  command="$1";
-  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  command="$1"
+  if is_running
   then
-    pre_log_len=`wc -l "$MCPATH/logs/latest.log" | awk '{print $1}'`
+    pre_log_len=$(wc -l "$MCPATH/logs/latest.log" | awk '{print $1}')
     echo "$SERVICE is running... executing command"
     as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"$command\"\015'"
-    sleep .1 # assumes that the command will run and print to the log file in less than .1 seconds
+    sleep .1
     # print output
-    tail -n $[`wc -l "$MCPATH/logs/latest.log" | awk '{print $1}'`-$pre_log_len] "$MCPATH/logs/latest.log"
+    tail -n $(($(wc -l "$MCPATH/logs/latest.log" | awk '{print $1}') - pre_log_len)) "$MCPATH/logs/latest.log"
+  else
+    echo "$SERVICE is not running."
+    return 1
   fi
 }
 
@@ -323,15 +341,18 @@ case "$1" in
       shift
       mc_backup_user "$*"
     else
-      echo "Must specify server command (try 'help'?)"
+      echo "Must specify user UUID"
+      exit 1
     fi
     ;;
   status)
-    if pgrep -u $USERNAME -f $SERVICE > /dev/null
+    if is_running
     then
       echo "$SERVICE is running."
+      exit 0
     else
       echo "$SERVICE is not running."
+      exit 3
     fi
     ;;
   command)
@@ -340,6 +361,7 @@ case "$1" in
       mc_command "$*"
     else
       echo "Must specify server command (try 'help'?)"
+      exit 1
     fi
     ;;
 
@@ -348,4 +370,4 @@ case "$1" in
   exit 1
   ;;
 esac
-exit 0
+exit $?

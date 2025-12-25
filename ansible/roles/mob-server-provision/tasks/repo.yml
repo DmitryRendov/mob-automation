@@ -8,13 +8,14 @@
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
 
-- name: Checkout servers repo
+- name: Checkout servers repo and update to the latest version
   become: yes
   become_user: "{{ minecraft_user }}"
   become_method: sudo
   git:
     repo: "{{ server_repo }}"
     dest: "{{ server_folder }}"
+    version: HEAD
     force: yes
     accept_hostkey: yes
 

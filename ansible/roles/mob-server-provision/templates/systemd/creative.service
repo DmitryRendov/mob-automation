@@ -1,17 +1,35 @@
 [Unit]
-Description=MOB Creative Server
+Description=MOB Creative Server (Minecraft)
 After=network.target local-fs.target
 Wants=firewalld.service
 
 [Service]
 Type=forking
 WorkingDirectory=/home/minecraft/mob-servers/creative
-ExecStart=/opt/minecraft/creative start
-ExecStop=/opt/minecraft/creative stop
 User=minecraft
 Group=minecraft
+
+# Start the service
+ExecStart=/opt/minecraft/creative start
+
+# Stop the service gracefully
+ExecStop=/opt/minecraft/creative stop
+
+# Enhanced reliability
+Restart=on-failure
 RestartSec=60
-Restart=always
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+# Resource limits
+LimitNOFILE=4096
+
+# Security hardening for Ubuntu 24.04
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/minecraft/mob-servers/creative /home/minecraft/backups/worlds
 
 [Install]
 WantedBy=multi-user.target

@@ -1,14 +1,107 @@
 ---
 
-- name: Placed service scripts to init.d
-  copy: src={{ item }} dest=/etc/init.d remote_src=true owner=root group=root mode="a+x"
+- name: Create systemd service files from templates
+  template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+    owner: root
+    group: root
+    mode: '0644'
   with_items:
-    - "{{ server_folder }}/rc-scripts/bungeecord"
-    - "{{ server_folder }}/rc-scripts/lobby"
-    - "{{ server_folder }}/rc-scripts/survival"
-    - "{{ server_folder }}/rc-scripts/vanilla"
+    - bungeecord
+    - lobby
+    - survival
+    - vanilla
 
-- name: Starting all the game servers before update
-  command: echo "Starting servers..."
-  notify: restart game servers
-- meta: flush_handlers 
+- name: Create init.d scripts from templates
+  template:
+    src: "{{ item }}.j2"
+    dest: "/opt/minecraft/{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  with_items:
+    - bungeecord
+    - lobby
+    - survival
+    - vanilla
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
+
+
+- name: Enable and start bungeecord service
+  systemd:
+    name: bungeecord
+    enabled: yes
+    state: started
+
+- name: Wait before checking bungeecord service status
+  pause:
+    seconds: "{{ service_restart_cooldown }}"
+
+- name: Wait and check bungeecord service status
+  systemd:
+    name: bungeecord
+    state: started
+  register: bungeecord_status
+  failed_when: bungeecord_status.status.ActiveState != 'active'
+
+
+
+- name: Enable and start lobby service
+  systemd:
+    name: lobby
+    enabled: yes
+    state: started
+
+- name: Wait before checking lobby service status
+  pause:
+    seconds: "{{ service_restart_cooldown }}"
+
+- name: Wait and check lobby service status
+  systemd:
+    name: lobby
+    state: started
+  register: lobby_status
+  failed_when: lobby_status.status.ActiveState != 'active'
+
+
+
+- name: Enable and start vanilla service
+  systemd:
+    name: vanilla
+    enabled: yes
+    state: started
+
+- name: Wait before checking vanilla service status
+  pause:
+    seconds: "{{ service_restart_cooldown }}"
+
+- name: Wait and check vanilla service status
+  systemd:
+    name: vanilla
+    state: started
+  register: vanilla_status
+  failed_when: vanilla_status.status.ActiveState != 'active'
+
+
+
+- name: Enable and start survival service
+  systemd:
+    name: survival
+    enabled: yes
+    state: started
+
+- name: Wait before checking survival service status
+  pause:
+    seconds: "{{ service_restart_cooldown }}"
+
+- name: Wait and check survival service status
+  systemd:
+    name: survival
+    state: started
+  register: survival_status
+  failed_when: survival_status.status.ActiveState != 'active'

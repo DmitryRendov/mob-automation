@@ -17,55 +17,69 @@ SERVICE='BungeeCord.jar'
 USERNAME='minecraft'
 SCREENNAME='proxy'
 SERVICEPATH='/home/minecraft/mob-servers/bungeecord'
-MAXHEAP=2048
-MINHEAP=2048
+MAXHEAP={{ servers_memory_allocation.bungeecord }}
+MINHEAP={{ servers_memory_allocation.bungeecord }}
 HISTORY=512
-CPU_COUNT=2
-INVOCATION="java -Xmx${MAXHEAP}M -Xms${MINHEAP}M \
+INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} \
 -Dio.netty.recycler.maxCapacity.default=20000 -XX:G1HeapRegionSize=4M -Dfile.encoding=UTF-8 \
 -jar $SERVICE"
 
-ME=`whoami`
+ME=$(whoami)
 as_user() {
-  if [ $ME == $USERNAME ] ; then
+  if [ "$ME" = "$USERNAME" ] ; then
     bash -c "$1"
   else
-    su - $USERNAME -c "$1"
+    su -s /bin/bash - "$USERNAME" -c "$1"
   fi
 }
 
+is_running() {
+  pgrep -u "$USERNAME" -f "$SERVICE" > /dev/null 2>&1
+}
+
 bg_start() {
-  if  pgrep -u $USERNAME -f $SERVICE > /dev/null
+  if is_running
   then
     echo "$SERVICE is already running!"
+    return 0
   else
     echo "Starting $SERVICE..."
-    cd $SERVICEPATH
-    as_user "cd $SERVICEPATH && screen -h $HISTORY -dmS $SCREENNAME $INVOCATION"
-    sleep 7
-    if pgrep -u $USERNAME -f $SERVICE > /dev/null
-    then
-      echo "$SERVICE is now running."
-    else
-      echo "Error! Could not start $SERVICE!"
-    fi
+    as_user "cd '$SERVICEPATH' && screen -h $HISTORY -dmS $SCREENNAME $INVOCATION"
+    
+    # Wait up to 10 seconds for service to start
+    for i in {1..10}; do
+      sleep 1
+      if is_running; then
+        echo "$SERVICE is now running."
+        return 0
+      fi
+    done
+    
+    echo "Error! Could not start $SERVICE!"
+    return 1
   fi
 }
 
 bg_stop() {
-  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  if is_running
   then
     echo "Stopping $SERVICE"
     as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"end\"\015'"
-    sleep 7
+    
+    # Wait up to 15 seconds for graceful shutdown
+    for i in {1..15}; do
+      sleep 1
+      if ! is_running; then
+        echo "$SERVICE is stopped."
+        return 0
+      fi
+    done
+    
+    echo "Error! $SERVICE could not be stopped gracefully."
+    return 1
   else
     echo "$SERVICE was not running."
-  fi
-  if pgrep -u $USERNAME -f $SERVICE > /dev/null
-  then
-    echo "Error! $SERVICE could not be stopped."
-  else
-    echo "$SERVICE is stopped."
+    return 0
   fi
 }
 
@@ -82,11 +96,13 @@ case "$1" in
     bg_start
     ;;
   status)
-    if pgrep -u $USERNAME -f $SERVICE > /dev/null
+    if is_running
     then
       echo "$SERVICE is running."
+      exit 0
     else
       echo "$SERVICE is not running."
+      exit 3
     fi
     ;;
   *)
@@ -94,5 +110,4 @@ case "$1" in
   exit 1
   ;;
 esac
-exit 0
-
+exit $?

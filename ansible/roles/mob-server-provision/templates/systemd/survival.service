@@ -1,17 +1,35 @@
 [Unit]
-Description=MOB Survival Server
+Description=MOB Survival Server (Minecraft)
 After=network.target local-fs.target
 Wants=firewalld.service
 
 [Service]
 Type=forking
 WorkingDirectory=/home/minecraft/mob-servers/survival
-ExecStart=/opt/minecraft/survival start
-ExecStop=/opt/minecraft/survival stop
 User=minecraft
 Group=minecraft
+
+# Start the service
+ExecStart=/opt/minecraft/survival start
+
+# Stop the service gracefully
+ExecStop=/opt/minecraft/survival stop
+
+# Enhanced reliability
+Restart=on-failure
 RestartSec=60
-Restart=always
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+# Resource limits
+LimitNOFILE=4096
+
+# Security hardening for Ubuntu 24.04
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/minecraft/mob-servers/survival /home/minecraft/backups/worlds /home/minecraft/backups/users
 
 [Install]
 WantedBy=multi-user.target
