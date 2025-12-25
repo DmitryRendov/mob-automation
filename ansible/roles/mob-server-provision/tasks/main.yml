@@ -3,17 +3,18 @@
 - include: packages.yml
 
 - include: maintenance.yml
-  when: env_type == "live"
+  when: mode == "update"
 
 - include: repo.yml
 
 - include: configure.yml
-  when: env_type == "live"
 
 - include: worlds.yml
-  when: source == "reset"
+  when: mode == "setup" or mode == "reset"
 
 - include: database.yml
-  when: env_type == "stage" or env_type == "dev"
+  when: mode == "setup"
 
 - include: services.yml
+  when: mode == "setup"
+

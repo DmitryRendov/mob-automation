@@ -1,4 +1,39 @@
-target_path: /tmp
-source: false
-env_type: "dev"
-cooldown: 5
+temp_folder: /tmp
+
+# Minecraft server configuration
+# Available modes: setup, update, reset
+# -setup: fresh installation
+# -update: update existing installation
+# -reset: reset worlds to default   
+# Default: setup
+mode: setup
+
+minecraft_user: minecraft
+minecraft_group: minecraft
+server_repo: "git@github.com:DmitryRendov/mob-server.git"
+
+minecraft_home: /home/minecraft
+server_folder: "{{ minecraft_home }}/mob-servers"
+
+# Minecraft database configuration
+minecraft_db_name: mob_server
+minecraft_db_user: minecraft
+minecraft_db_src:
+ - bucket: mob-server-backups
+   object: dev/1.21.1/latest/survival.dump.tar.gz
+
+# Server region sources URLs
+server_src:
+  lobby:
+   - bucket: mob-server-backups
+     object: dev/1.21.1/latest/lobby.tar.gz
+  survival:
+   - bucket: mob-server-backups
+     object: dev/1.21.1/latest/survival.tar.gz
+  vanilla:
+   - bucket: mob-server-backups
+     object: dev/1.21.1/latest/vanilla.tar.gz
+
+service_restart_cooldown: 10
+service_stop_cooldown: 10
+

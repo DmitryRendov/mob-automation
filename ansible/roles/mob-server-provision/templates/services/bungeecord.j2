@@ -1,0 +1,98 @@
+#!/bin/bash
+ 
+### BEGIN INIT INFO
+# Provides:   bungeecord
+# Required-Start: $local_fs $remote_fs screen-cleanup
+# Required-Stop:  $local_fs $remote_fs
+# Should-Start:   $network
+# Should-Stop:    $network
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Short-Description:    Bungeecord server
+# Description:    Starts the bungeecord server
+### END INIT INFO
+ 
+# Settings
+SERVICE='BungeeCord.jar'
+USERNAME='minecraft'
+SCREENNAME='proxy'
+SERVICEPATH='/home/minecraft/mob-servers/bungeecord'
+MAXHEAP=2048
+MINHEAP=2048
+HISTORY=512
+CPU_COUNT=2
+INVOCATION="java -Xmx${MAXHEAP}M -Xms${MINHEAP}M \
+-Dio.netty.recycler.maxCapacity.default=20000 -XX:G1HeapRegionSize=4M -Dfile.encoding=UTF-8 \
+-jar $SERVICE"
+
+ME=`whoami`
+as_user() {
+  if [ $ME == $USERNAME ] ; then
+    bash -c "$1"
+  else
+    su - $USERNAME -c "$1"
+  fi
+}
+
+bg_start() {
+  if  pgrep -u $USERNAME -f $SERVICE > /dev/null
+  then
+    echo "$SERVICE is already running!"
+  else
+    echo "Starting $SERVICE..."
+    cd $SERVICEPATH
+    as_user "cd $SERVICEPATH && screen -h $HISTORY -dmS $SCREENNAME $INVOCATION"
+    sleep 7
+    if pgrep -u $USERNAME -f $SERVICE > /dev/null
+    then
+      echo "$SERVICE is now running."
+    else
+      echo "Error! Could not start $SERVICE!"
+    fi
+  fi
+}
+
+bg_stop() {
+  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  then
+    echo "Stopping $SERVICE"
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"end\"\015'"
+    sleep 7
+  else
+    echo "$SERVICE was not running."
+  fi
+  if pgrep -u $USERNAME -f $SERVICE > /dev/null
+  then
+    echo "Error! $SERVICE could not be stopped."
+  else
+    echo "$SERVICE is stopped."
+  fi
+}
+
+# The main events processor
+case "$1" in
+  start)
+    bg_start
+    ;;
+  stop)
+    bg_stop
+    ;;
+  restart)
+    bg_stop
+    bg_start
+    ;;
+  status)
+    if pgrep -u $USERNAME -f $SERVICE > /dev/null
+    then
+      echo "$SERVICE is running."
+    else
+      echo "$SERVICE is not running."
+    fi
+    ;;
+  *)
+  echo "Usage: $0 {start|stop|status|restart}"
+  exit 1
+  ;;
+esac
+exit 0
+

@@ -1,0 +1,17 @@
+[Unit]
+Description=MOB Vanilla Server
+After=network.target local-fs.target
+Wants=firewalld.service
+
+[Service]
+Type=forking
+WorkingDirectory=/home/minecraft/mob-servers/vanilla
+ExecStart=/opt/minecraft/vanilla start
+ExecStop=/opt/minecraft/vanilla stop
+User=minecraft
+Group=minecraft
+RestartSec=60
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

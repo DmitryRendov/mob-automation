@@ -6,6 +6,6 @@
     - "survival"
     - "vanilla"
   notify: stop game servers
-- pause: minutes={{ cooldown }}
+- pause: minutes={{ service_stop_cooldown }}
 - meta: flush_handlers
 

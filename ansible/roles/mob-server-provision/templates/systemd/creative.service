@@ -1,0 +1,17 @@
+[Unit]
+Description=MOB Creative Server
+After=network.target local-fs.target
+Wants=firewalld.service
+
+[Service]
+Type=forking
+WorkingDirectory=/home/minecraft/mob-servers/creative
+ExecStart=/opt/minecraft/creative start
+ExecStop=/opt/minecraft/creative stop
+User=minecraft
+Group=minecraft
+RestartSec=60
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

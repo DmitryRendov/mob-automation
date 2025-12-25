@@ -1,0 +1,17 @@
+[Unit]
+Description=MOB Lobby Server
+After=network.target local-fs.target
+Wants=firewalld.service
+
+[Service]
+Type=forking
+WorkingDirectory=/home/minecraft/mob-servers/lobby
+ExecStart=/opt/minecraft/lobby start
+ExecStop=/opt/minecraft/lobby stop
+User=minecraft
+Group=minecraft
+RestartSec=60
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

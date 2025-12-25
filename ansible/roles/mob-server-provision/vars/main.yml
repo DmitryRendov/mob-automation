@@ -1,0 +1,7 @@
+---
+
+# Minecraft database configuration
+minecraft_db_password: ""
+discord_bot_token: ""
+geoip_api_key: ""
+

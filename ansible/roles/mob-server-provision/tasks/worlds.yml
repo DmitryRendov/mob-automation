@@ -1,7 +1,99 @@
 ---
-
+---
 - name: Create Lobby server source folder
-  file: path={{ server_folder }}/lobby/lobby/ state=directory mode=0755 owner={{ minecraft_user }} group={{ minecraft_group }}
+  file:
+    path: "{{ server_folder }}/lobby/lobby/"
+    state: directory
+    mode: 0755
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+
+- name: Download Lobby server source from Dropbox
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  get_url:
+    url: "{{ server_lobby_src }}"
+    dest: "{{ target_path }}"
+    mode: 0644
+  register: sourcedl_lobby
+
+- name: Unpack Lobby server source
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  unarchive:
+    src: "{{ sourcedl_lobby.dest }}"
+    dest: "{{ server_folder }}/lobby/"
+    copy: no
+    force: yes
+
+
+
+- name: Create Survival server source folders
+  file:
+    path: "{{ server_folder }}/survival/{{ item }}/"
+    state: directory
+    mode: 0755
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+  with_items:
+    - "survival"
+    - "survival_nether"
+    - "survival_the_end"
+
+- name: Download Survial server source from Dropbox
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  get_url:
+    url: "{{ server_survival_src }}"
+    dest: "{{ target_path }}"
+    mode: 0644
+    timeout: 600
+  register: sourcedl_survival
+
+- name: Unpack Survival server source
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  unarchive:
+    src: "{{ sourcedl_survival.dest }}"
+    dest: "{{ server_folder }}/survival/"
+    copy: no
+    force: yes
+
+
+
+- name: Create Vanilla server source folder
+  file:
+    path: "{{ server_folder }}/vanilla/vanilla/"
+    state: directory
+    mode: 0755
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+
+- name: Download Vanilla server source from Dropbox
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  get_url:
+    url: "{{ server_vanilla_src }}"
+    dest: "{{ target_path }}"
+    mode: 0644
+    timeout: 600
+  register: sourcedl_vanilla
+
+- name: Unpack Vanilla server source
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  unarchive:
+    src: "{{ sourcedl_vanilla.dest }}"
+    dest: "{{ server_folder }}/vanilla/"
+    copy: no
+    force: yes
+- name: Create Lobby server source folder
+  file:
+    path: "{{ server_folder }}/lobby/lobby/"
+    state: directory
+    mode: 0755
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
 
 - name: Download Lobby server source from Dropbox
   become: yes
