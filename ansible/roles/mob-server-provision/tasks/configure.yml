@@ -80,3 +80,7 @@
     - path: "vanilla/plugins/LuckPerms/config.yml"
       regexp: '^\s*password:'
       line: "  password: '{{ minecraft_db_password }}'"
+
+    - path: "survival/plugins/Jobs/generalConfig.yml"
+      regexp: '^\s*password:'
+      line: '  password: {{ minecraft_db_password }}'

@@ -1,38 +1,42 @@
-#!/bin/bash
- 
+{% raw %}#!/bin/bash
+
 ### BEGIN INIT INFO
-# Provides:   lobby
+# Provides:       creative
 # Required-Start: $local_fs $remote_fs screen-cleanup
 # Required-Stop:  $local_fs $remote_fs
 # Should-Start:   $network
 # Should-Stop:    $network
 # Default-Start:  2 3 4 5
 # Default-Stop:   0 1 6
-# Short-Description:    Minecraft server #1 Lobby
-# Description:    Starts the minecraft server #1 Lobby
+# Short-Description:    Minecraft server
+# Description:    Starts the minecraft server
 ### END INIT INFO
  
 # Settings
-SERVICE='paper-lobby-{{ server_version }}.jar'
+{% endraw %}
+SERVICE='paper-creative-{{ server_version }}.jar'
 OPTIONS='--nogui'
 USERNAME='minecraft'
-SCREENNAME='lobby'
-WORLD='lobby'
-MCPATH='{{ server_folder }}/lobby'
+SCREENNAME='creative'
+WORLD='creative'
+MCPATH='{{ server_folder }}/creative'
 BACKUPPATH='{{ backup_folder }}'
-MAXHEAP={{ servers_configuration.lobby.memory }}
-MINHEAP={{ servers_configuration.lobby.memory }}
-HISTORY=256
-CPU_COUNT={{ servers_configuration.lobby.cpus }}
-INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} \
--XX:ParallelGCThreads=$CPU_COUNT \
--XX:+DisableExplicitGC \
--Dfile.encoding=UTF-8 \
+MAXHEAP={{ servers_configuration.creative.memory }}
+MINHEAP={{ servers_configuration.creative.memory }}
+HISTORY=512
+CPU_COUNT={{ servers_configuration.creative.cpus }}
+{% raw %}
+INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} -XX:ParallelGCThreads=$CPU_COUNT \
+-XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=50 \
+-XX:+DisableExplicitGC -XX:TargetSurvivorRatio=90 -XX:G1NewSizePercent=50 \
+-XX:G1MaxNewSizePercent=80 -XX:InitiatingHeapOccupancyPercent=10 \
+-XX:G1MixedGCLiveThresholdPercent=50 \
+-XX:+AlwaysPreTouch -Dfile.encoding=UTF-8 -Djava.awt.headless=true \
 -jar $SERVICE $OPTIONS"
 
+
 # Dirs and userdata to backup
-D2BACKUP[0]='lobby'
-D2BACKUP[1]='plugins/Essentials/userdata/'
+D2BACKUP[0]='creative'
 
 ME=$(whoami)
 as_user() {
@@ -131,6 +135,11 @@ mc_backup() {
    BACKUP_FILE="$BACKUPPATH/${WORLD}_${NOW}.tar"
 
    echo ""
+   echo "Removing old backups..."
+   echo "" 
+   find "$BACKUPPATH" -name "*.gz" -mtime +14 -exec rm {} \;
+
+   echo ""
    echo "Backing up minecraft world..."
    echo "" 
 
@@ -215,3 +224,4 @@ case "$1" in
   ;;
 esac
 exit $?
+{% endraw %}

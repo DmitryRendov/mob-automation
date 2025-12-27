@@ -24,12 +24,13 @@ TimeoutStopSec=30
 # Resource limits
 LimitNOFILE=4096
 
-# Security hardening for Ubuntu 24.04
+# Security hardening for Ubuntu 24.04 
+# TODO: enforce sandbox via ProtectSystem=strict
 PrivateTmp=true
 NoNewPrivileges=true
-ProtectSystem=strict
+ProtectSystem=full
 ProtectHome=read-only
-ReadWritePaths=/home/minecraft/mob-servers/creative /home/minecraft/backups/worlds
+ReadWritePaths=/home/minecraft/mob-servers/creative /home/minecraft/backups/worlds /run/screen
 
 [Install]
 WantedBy=multi-user.target

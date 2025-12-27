@@ -11,14 +11,14 @@
 # Short-Description:    Bungeecord server
 # Description:    Starts the bungeecord server
 ### END INIT INFO
- 
+
 # Settings
 SERVICE='BungeeCord.jar'
 USERNAME='minecraft'
 SCREENNAME='proxy'
 SERVICEPATH='/home/minecraft/mob-servers/bungeecord'
-MAXHEAP={{ servers_memory_allocation.bungeecord }}
-MINHEAP={{ servers_memory_allocation.bungeecord }}
+MAXHEAP={{ servers_configuration.bungeecord.memory }}
+MINHEAP={{ servers_configuration.bungeecord.memory }}
 HISTORY=512
 INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} \
 -Dio.netty.recycler.maxCapacity.default=20000 -XX:G1HeapRegionSize=4M -Dfile.encoding=UTF-8 \

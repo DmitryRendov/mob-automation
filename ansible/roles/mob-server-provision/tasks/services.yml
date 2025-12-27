@@ -1,27 +1,37 @@
 ---
 
+- name: Create a folder for init.d scripts
+  file:
+    path: /opt/minecraft
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Create systemd service files from templates
   template:
-    src: "{{ item }}.service.j2"
+    src: "systemd/{{ item }}.service"
     dest: "/etc/systemd/system/{{ item }}.service"
     owner: root
     group: root
     mode: '0644'
   with_items:
     - bungeecord
+    - creative
     - lobby
     - survival
     - vanilla
 
 - name: Create init.d scripts from templates
   template:
-    src: "{{ item }}.j2"
+    src: "services/{{ item }}.j2"
     dest: "/opt/minecraft/{{ item }}"
     owner: root
     group: root
     mode: '0755'
   with_items:
     - bungeecord
+    - creative
     - lobby
     - survival
     - vanilla
@@ -51,57 +61,74 @@
 
 
 
-- name: Enable and start lobby service
-  systemd:
-    name: lobby
-    enabled: yes
-    state: started
+# - name: Enable and start lobby service
+#   systemd:
+#     name: lobby
+#     enabled: yes
+#     state: started
 
-- name: Wait before checking lobby service status
-  pause:
-    seconds: "{{ service_restart_cooldown }}"
+# - name: Wait before checking lobby service status
+#   pause:
+#     seconds: "{{ service_restart_cooldown }}"
 
-- name: Wait and check lobby service status
-  systemd:
-    name: lobby
-    state: started
-  register: lobby_status
-  failed_when: lobby_status.status.ActiveState != 'active'
-
-
-
-- name: Enable and start vanilla service
-  systemd:
-    name: vanilla
-    enabled: yes
-    state: started
-
-- name: Wait before checking vanilla service status
-  pause:
-    seconds: "{{ service_restart_cooldown }}"
-
-- name: Wait and check vanilla service status
-  systemd:
-    name: vanilla
-    state: started
-  register: vanilla_status
-  failed_when: vanilla_status.status.ActiveState != 'active'
+# - name: Wait and check lobby service status
+#   systemd:
+#     name: lobby
+#     state: started
+#   register: lobby_status
+#   failed_when: lobby_status.status.ActiveState != 'active'
 
 
+# - name: Enable and start creative service
+#   systemd:
+#     name: creative
+#     enabled: yes
+#     state: started
 
-- name: Enable and start survival service
-  systemd:
-    name: survival
-    enabled: yes
-    state: started
+# - name: Wait before checking creative service status
+#   pause:
+#     seconds: "{{ service_restart_cooldown }}"
 
-- name: Wait before checking survival service status
-  pause:
-    seconds: "{{ service_restart_cooldown }}"
+# - name: Wait and check creative service status
+#   systemd:
+#     name: creative
+#     state: started
+#   register: creative_status
+#   failed_when: creative_status.status.ActiveState != 'active'
 
-- name: Wait and check survival service status
-  systemd:
-    name: survival
-    state: started
-  register: survival_status
-  failed_when: survival_status.status.ActiveState != 'active'
+
+# - name: Enable and start vanilla service
+#   systemd:
+#     name: vanilla
+#     enabled: yes
+#     state: started
+
+# - name: Wait before checking vanilla service status
+#   pause:
+#     seconds: "{{ service_restart_cooldown }}"
+
+# - name: Wait and check vanilla service status
+#   systemd:
+#     name: vanilla
+#     state: started
+#   register: vanilla_status
+#   failed_when: vanilla_status.status.ActiveState != 'active'
+
+
+
+# - name: Enable and start survival service
+#   systemd:
+#     name: survival
+#     enabled: yes
+#     state: started
+
+# - name: Wait before checking survival service status
+#   pause:
+#     seconds: "{{ service_restart_cooldown }}"
+
+# - name: Wait and check survival service status
+#   systemd:
+#     name: survival
+#     state: started
+#   register: survival_status
+#   failed_when: survival_status.status.ActiveState != 'active'

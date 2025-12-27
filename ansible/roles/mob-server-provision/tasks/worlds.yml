@@ -8,46 +8,95 @@
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
 
-- name: Download and unpack server sources from S3
-  block:
-    - name: Create server source folders
-      file:
-        path: "{{ server_folder }}/{{ item.name }}/{{ item.world }}/"
-        state: directory
-        mode: 0755
-        owner: "{{ minecraft_user }}"
-        group: "{{ minecraft_group }}"
-      loop:
-        - { name: "lobby", world: "lobby" }
-        - { name: "survival", world: "survival" }
-        - { name: "survival", world: "survival_nether" }
-        - { name: "survival", world: "survival_the_end" }
-        - { name: "vanilla", world: "vanilla" }
+- name: Create server source folders
+  file:
+    path: "{{ server_folder }}/{{ item.name }}/{{ item.world }}/"
+    state: directory
+    mode: 0755
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+  loop:
+    - { name: "lobby", world: "lobby" }
+    - { name: "survival", world: "survival" }
+    - { name: "survival", world: "survival_nether" }
+    - { name: "survival", world: "survival_the_end" }
+    - { name: "vanilla", world: "vanilla" }
+    - { name: "creative", world: "creative" }
 
-    - name: Download server sources from S3
-      become: yes
-      become_user: "{{ minecraft_user }}"
-      aws_s3:
-        bucket: "{{ server_src.bucket }}"
-        object: "{{ server_src.path }}/{{ item.archive }}"
-        dest: "{{ server_folder }}/{{ item.name }}/{{ item.archive }}"
-        mode: get
-      loop:
-        - { name: "lobby", archive: "lobby.tar.gz" }
-        - { name: "survival", archive: "survival.tar.gz" }
-        - { name: "vanilla", archive: "vanilla.tar.gz" }
-      register: s3_downloads
+- name: Download server sources from S3
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  aws_s3:
+    bucket: "{{ bucket }}"
+    object: "{{ item.object }}"
+    dest: "{{ server_folder }}/{{ item.name }}/{{ item.archive }}"
+    mode: get
+  loop:
+    - { name: "lobby", archive: "lobby.tar.gz", object: "{{ server_lobby_src }}" }
+    - { name: "survival", archive: "survival.tar.gz", object: "{{ server_survival_src.survival }}" }
+    - { name: "survival", archive: "survival_nether.tar.gz", object: "{{ server_survival_src.survival_nether }}" }
+    - { name: "survival", archive: "survival_the_end.tar.gz", object: "{{ server_survival_src.survival_the_end }}" }
+    - { name: "vanilla", archive: "vanilla.tar.gz", object: "{{ server_vanilla_src }}" }
+    - { name: "creative", archive: "creative.tar.gz", object: "{{ server_creative_src }}" }
+  register: s3_downloads
 
-    - name: Unpack server sources
-      become: yes
-      become_user: "{{ minecraft_user }}"
-      unarchive:
-        src: "{{ server_folder }}/{{ item.name }}/{{ item.archive }}"
-        dest: "{{ server_folder }}/{{ item.name }}/"
-        remote_src: yes
-        force: yes
-      loop:
-        - { name: "lobby", archive: "lobby.tar.gz" }
-        - { name: "survival", archive: "survival.tar.gz" }
-        - { name: "vanilla", archive: "vanilla.tar.gz" }
+- name: Unpack server sources
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  unarchive:
+    src: "{{ server_folder }}/{{ item.name }}/{{ item.archive }}"
+    dest: "{{ server_folder }}/{{ item.name }}/"
+    remote_src: yes
+  loop:
+    - { name: "lobby", archive: "lobby.tar.gz" }
+    - { name: "survival", archive: "survival.tar.gz" }
+    - { name: "survival", archive: "survival_nether.tar.gz" }
+    - { name: "survival", archive: "survival_the_end.tar.gz" }
+    - { name: "vanilla", archive: "vanilla.tar.gz" }
+    - { name: "creative", archive: "creative.tar.gz" }
 
+- name: Create custom folder for dynmap
+  file:
+    path: "{{ server_folder }}/survival/plugins/dynmap/web/"
+    state: directory
+    mode: 0755
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+
+- name: Download dynmap tiles from S3
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  aws_s3:
+    bucket: "{{ bucket }}"
+    object: "{{ server_survival_src.dynmap }}"
+    dest: "{{ server_folder }}/survival/plugins/dynmap/web/tiles.tar.gz"
+    mode: get
+  register: dynmap_download
+
+- name: Unpack dynmap tiles
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  unarchive:
+    src: "{{ server_folder }}/survival/plugins/dynmap/web/tiles.tar.gz"
+    dest: "{{ server_folder }}/survival/plugins/dynmap/web/"
+    remote_src: yes
+  when: dynmap_download.changed
+
+# - name: Remove downloaded server source archives
+#   file:
+#     path: "{{ server_folder }}/{{ item.name }}/{{ item.archive }}"
+#     state: absent
+#   loop:
+#     - { name: "lobby", archive: "lobby.tar.gz" }
+#     - { name: "survival", archive: "survival.tar.gz" }
+#     - { name: "survival", archive: "survival_nether.tar.gz" }
+#     - { name: "survival", archive: "survival_the_end.tar.gz" }
+#     - { name: "vanilla", archive: "vanilla.tar.gz" }
+#     - { name: "creative", archive: "creative.tar.gz" }
+#   when: s3_downloads.changed
+
+# - name: Remove downloaded dynmap tiles archive
+#   file:
+#     path: "{{ server_folder }}/survival/plugins/dynmap/web/tiles.tar.gz"
+#     state: absent
+#   when: dynmap_download.changed

@@ -1,4 +1,4 @@
-#!/bin/bash
+{% raw %}#!/bin/bash
 
 ### BEGIN INIT INFO
 # Provides:       survival
@@ -13,6 +13,7 @@
 ### END INIT INFO
  
 # Settings
+{% endraw %}
 SERVICE='paper-survival-{{ server_version }}.jar'
 OPTIONS='--nogui'
 USERNAME='minecraft'
@@ -24,6 +25,7 @@ MAXHEAP={{ servers_configuration.survival.memory }}
 MINHEAP={{ servers_configuration.survival.memory }}
 HISTORY=1024
 CPU_COUNT={{ servers_configuration.survival.cpus }}
+{% raw %}
 INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} -XX:ParallelGCThreads=$CPU_COUNT \
 -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=50 \
 -XX:+DisableExplicitGC -XX:SurvivorRatio=32 -XX:G1NewSizePercent=30 \
@@ -32,7 +34,7 @@ INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} -XX:ParallelGCThreads=$CPU_COUNT 
 -XX:+ParallelRefProcEnabled -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 \
 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 \
 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true \
--Dfile.encoding=UTF-8 -Dpaper.playerconnection.keepalive=60 \
+-Dfile.encoding=UTF-8 -Dpaper.playerconnection.keepalive=60 -Djava.awt.headless=true \
 -jar $SERVICE $OPTIONS"
 
 # Dirs and userdata to backup
@@ -168,8 +170,9 @@ mc_backup() {
    echo ""
    echo "Backup of the server database..."
    echo ""
+{% endraw %}
    mysqldump -u minecraft -p'{{ minecraft_db_password }}' -h localhost mob_server | gzip -9 > "${BACKUPPATH}/mob_server_${NOW}.dump.gz"
-
+{% raw %}
    echo ""
    echo "Backing up Survival world Safe zone..."
    echo ""
@@ -371,3 +374,4 @@ case "$1" in
   ;;
 esac
 exit $?
+{% endraw %}

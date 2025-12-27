@@ -2,32 +2,38 @@
 
 - name: Remove the game server schema if exists
   mysql_db:
-    name: "{{ server_db_name }}"
+    name: "{{ minecraft_db_name }}"
     state: absent
+    login_user: "{{ minecraft_db_user }}"
+    login_password: "{{ minecraft_db_password }}"
 
 - name: Create a database of the game server
   mysql_db:
-    name: "{{ server_db_name }}"
+    name: "{{ minecraft_db_name }}"
     state: present
+    login_user: "{{ minecraft_db_user }}"
+    login_password: "{{ minecraft_db_password }}"
 
 - name: Download the game server latest MySQL dump from AWS S3
-  amazon.aws.aws_s3:
-    bucket: "{{ minecraft_db_src.0.bucket }}"
-    object: "{{ minecraft_db_src.0.object }}"
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  aws_s3:
+    bucket: "{{ bucket }}"
+    object: "{{ server_db_src }}"
     dest: "{{ temp_folder }}/survival.dump.tar.gz"
     mode: get
   register: mysql_dump
 
 - name: Restore it to the site database
   mysql_db:
-    name: "{{ server_db_name }}"
+    name: "{{ minecraft_db_name }}"
     state: import
-    target: "{{ mysql_dump.dest }}"
-    login_user: root
-    login_password: "{{ mysql_root_password }}"
+    target: "{{ temp_folder }}/survival.dump.tar.gz"
+    login_user: "{{ minecraft_db_user }}"
+    login_password: "{{ minecraft_db_password }}"
 
-- name: Remove the downloaded MySQL dump file
-  file:
-    path: "{{ mysql_dump.dest }}"
-    state: absent
-  when: mysql_dump.changed
+# - name: Remove the downloaded MySQL dump file
+#   file:
+#     path: "{{ temp_folder }}/survival.dump.tar.gz"
+#     state: absent
+#   when: mysql_dump.changed

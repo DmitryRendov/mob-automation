@@ -4,3 +4,10 @@
   apt: pkg={{ item }} state=present
   with_items:
     - "{{ packages }}"
+
+- name: Install boto3 and botocore for AWS S3 operations
+  pip:
+    name:
+      - boto3
+      - botocore
+    state: present

@@ -1,7 +1,7 @@
 # MOB server provisioning
 #
-# ansible-playbook -i ./inventory/dev  mob-server-provision.yml --extra-vars "env=mobserver-dev env_type=dev user=dmitry" -vv
-# ansible-playbook -i ./inventory/live mob-server-provision.yml --extra-vars "env=mobserver password=VeryTopSecret123 env_type=live user=dmitry" -vv
+# ansible-playbook -i ./inventory/dev mob-server-provision.yml  -e "env=mobserver user=minecraft" -e "@local.vars.yml" -v
+# ansible-playbook -i ./inventory/live mob-server-provision.yml -e "env=mobserver-vps user=minecraft" -e "@local.vars.yml" -v
 
 - hosts: "{{env}}"
   user: "{{user}}"

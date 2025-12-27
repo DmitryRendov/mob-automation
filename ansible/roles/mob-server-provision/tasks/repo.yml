@@ -15,7 +15,7 @@
   git:
     repo: "{{ server_repo }}"
     dest: "{{ server_folder }}"
-    version: HEAD
+    version: "{{ server_release }}"
     force: yes
     accept_hostkey: yes
 
