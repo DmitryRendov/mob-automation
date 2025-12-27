@@ -1,31 +1,39 @@
 ---
 
-- name: Remove the game server database
-  mysql_db: name={{ server_db_name }} state=absent
+- name: Remove the game server schema if exists
+  mysql_db:
+    name: "{{ minecraft_db_name }}"
+    state: absent
+    login_user: "{{ minecraft_db_user }}"
+    login_password: "{{ minecraft_db_password }}"
 
 - name: Create a database of the game server
-  mysql_db: name={{ server_db_name }} state=present
+  mysql_db:
+    name: "{{ minecraft_db_name }}"
+    state: present
+    login_user: "{{ minecraft_db_user }}"
+    login_password: "{{ minecraft_db_password }}"
 
-- name: Force custom password using if it's set as a playbook variable
-  set_fact:
-    server_db_users:
-      - name: minecraft
-        host: localhost
-        pass: "{{ password }}"
-        priv: "*.*:ALL"
-  when: password is defined
-
-- name: Create the database users
-  mysql_user: name={{ item.name }}  password={{ item.pass|default("Secret123") }}
-              priv={{ item.priv|default("*.*:ALL") }} state=present host={{ item.host | default("localhost") }}
-  with_items: "{{ server_db_users }}"
-  when: server_db_users|lower() != 'none'
-
-- name: Downloading the game server latest MySQL dump from Dropbox
-  get_url:
-    url="{{ server_dump_src }}"
-    dest="{{ target_path }}"
+- name: Download the game server latest MySQL dump from AWS S3
+  become: yes
+  become_user: "{{ minecraft_user }}"
+  aws_s3:
+    bucket: "{{ bucket }}"
+    object: "{{ server_db_src }}"
+    dest: "{{ temp_folder }}/survival.dump.tar.gz"
+    mode: get
   register: mysql_dump
 
 - name: Restore it to the site database
-  mysql_db: name={{ server_db_name }} state=import target={{ mysql_dump.dest }}
+  mysql_db:
+    name: "{{ minecraft_db_name }}"
+    state: import
+    target: "{{ temp_folder }}/survival.dump.tar.gz"
+    login_user: "{{ minecraft_db_user }}"
+    login_password: "{{ minecraft_db_password }}"
+
+# - name: Remove the downloaded MySQL dump file
+#   file:
+#     path: "{{ temp_folder }}/survival.dump.tar.gz"
+#     state: absent
+#   when: mysql_dump.changed

@@ -23,6 +23,7 @@ packages:
     - curl
     - wget
     - unzip
+    - net-tools
     - ca-certificates
     - apt-transport-https
     - software-properties-common

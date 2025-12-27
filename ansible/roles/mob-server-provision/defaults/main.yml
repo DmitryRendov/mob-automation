@@ -1,4 +1,64 @@
-target_path: /tmp
-source: false
-env_type: "dev"
-cooldown: 5
+temp_folder: /tmp
+
+packages:
+  - screen
+  - git
+
+# Minecraft server configuration
+# Available modes: setup, update, reset
+# -setup: fresh installation
+# -update: update existing installation
+# -reset: reset worlds to default   
+# Default: setup
+mode: update
+server_env: dev
+server_version: 1.21.1
+
+minecraft_user: minecraft
+minecraft_group: minecraft
+server_repo: "git@github.com:DmitryRendov/mob-server.git"
+server_release: HEAD
+
+minecraft_home: /home/minecraft
+server_folder: "{{ minecraft_home }}/mob-servers"
+backup_folder: "{{ minecraft_home }}/backups/worlds"
+
+# Server resources allocation
+servers_configuration:
+  bungeecord: 
+    memory: 1G
+    cpus: 1
+  lobby:
+    memory: 1G
+    cpus: 1
+  survival:
+    memory: 4G
+    cpus: 4
+  vanilla:
+    memory: 1G
+    cpus: 1
+  creative:
+    memory: 1G
+    cpus: 1
+
+
+bucket: mob-server-backups
+
+# Minecraft database configuration
+minecraft_db_name: mob_server
+minecraft_db_user: minecraft
+server_db_src: "{{ server_env }}/{{ server_version }}/latest/survival.dump.tar.gz"
+
+# Server region sources URLs
+server_survival_src: 
+ survival: "{{ server_env }}/{{ server_version }}/latest/survival.tar.gz"
+ survival_nether: "{{ server_env }}/{{ server_version }}/latest/survival_nether.tar.gz"
+ survival_the_end: "{{ server_env }}/{{ server_version }}/latest/survival_the_end.tar.gz"
+ dynmap: "{{ server_env }}/{{ server_version }}/latest/tiles.tar.gz"
+server_lobby_src: "{{ server_env }}/{{ server_version }}/latest/lobby.tar.gz"
+server_vanilla_src: "{{ server_env }}/{{ server_version }}/latest/vanilla.tar.gz"
+server_creative_src: "{{ server_env }}/{{ server_version }}/latest/creative.tar.gz"
+
+service_restart_cooldown: 10
+service_stop_cooldown: 10
+

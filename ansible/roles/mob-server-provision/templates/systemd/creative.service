@@ -1,0 +1,36 @@
+[Unit]
+Description=MOB Creative Server (Minecraft)
+After=network.target local-fs.target
+Wants=firewalld.service
+
+[Service]
+Type=forking
+WorkingDirectory=/home/minecraft/mob-servers/creative
+User=minecraft
+Group=minecraft
+
+# Start the service
+ExecStart=/opt/minecraft/creative start
+
+# Stop the service gracefully
+ExecStop=/opt/minecraft/creative stop
+
+# Enhanced reliability
+Restart=on-failure
+RestartSec=60
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+# Resource limits
+LimitNOFILE=4096
+
+# Security hardening for Ubuntu 24.04 
+# TODO: enforce sandbox via ProtectSystem=strict
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/home/minecraft/mob-servers/creative /home/minecraft/backups/worlds /run/screen
+
+[Install]
+WantedBy=multi-user.target

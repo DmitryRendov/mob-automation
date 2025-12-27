@@ -24,7 +24,27 @@
       description=MOB Minecraft Server Port
       ports=25565/tcp
   notify: restart ufw service
-    
+
+- name: Allow Minecraft application through UFW
+  ufw:
+    rule: allow
+    name: minecraft
+
+- name: Create a Dynmap xml service ufw profile
+  copy:
+    dest: /etc/ufw/applications.d/dynmap
+    content: |
+      [dynmap]
+      title=MOB Dynmap Service
+      description=MOB Dynmap Service Ports
+      ports=8123:8124/tcp
+  notify: restart ufw service
+
+- name: Allow Dynmap application through UFW
+  ufw:
+    rule: allow
+    name: dynmap
+
 - name: Enable UFW
   ufw:
     state: enabled

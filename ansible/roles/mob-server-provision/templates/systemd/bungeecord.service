@@ -1,0 +1,36 @@
+[Unit]
+Description=MOB Proxy Server (BungeeCord)
+After=network.target local-fs.target
+Wants=firewalld.service
+
+[Service]
+Type=forking
+WorkingDirectory=/home/minecraft/mob-servers/bungeecord
+User=minecraft
+Group=minecraft
+
+# Start the service
+ExecStart=/opt/minecraft/bungeecord start
+
+# Stop the service gracefully
+ExecStop=/opt/minecraft/bungeecord stop
+
+# Enhanced reliability
+Restart=on-failure
+RestartSec=60
+TimeoutStartSec=30
+TimeoutStopSec=20
+
+# Resource limits
+LimitNOFILE=4096
+
+# Security hardening for Ubuntu 24.04 
+# TODO: enforce sandbox via ProtectSystem=strict
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/home/minecraft/mob-servers/bungeecord /run/screen
+
+[Install]
+WantedBy=multi-user.target

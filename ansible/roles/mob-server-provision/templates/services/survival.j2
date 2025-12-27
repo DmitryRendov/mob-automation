@@ -1,0 +1,377 @@
+{% raw %}#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:       survival
+# Required-Start: $local_fs $remote_fs screen-cleanup
+# Required-Stop:  $local_fs $remote_fs
+# Should-Start:   $network
+# Should-Stop:    $network
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Short-Description:    Minecraft server
+# Description:    Starts the minecraft server
+### END INIT INFO
+ 
+# Settings
+{% endraw %}
+SERVICE='paper-survival-{{ server_version }}.jar'
+OPTIONS='--nogui'
+USERNAME='minecraft'
+SCREENNAME='survival'
+WORLD='survival'
+MCPATH='{{ server_folder }}/survival'
+BACKUPPATH='{{ backup_folder }}'
+MAXHEAP={{ servers_configuration.survival.memory }}
+MINHEAP={{ servers_configuration.survival.memory }}
+HISTORY=1024
+CPU_COUNT={{ servers_configuration.survival.cpus }}
+{% raw %}
+INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} -XX:ParallelGCThreads=$CPU_COUNT \
+-XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=50 \
+-XX:+DisableExplicitGC -XX:SurvivorRatio=32 -XX:G1NewSizePercent=30 \
+-XX:G1MaxNewSizePercent=50 -XX:InitiatingHeapOccupancyPercent=15 -XX:+AlwaysPreTouch \
+-XX:G1MixedGCLiveThresholdPercent=50 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 \
+-XX:+ParallelRefProcEnabled -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 \
+-XX:G1RSetUpdatingPauseTimePercent=5 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 \
+-Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true \
+-Dfile.encoding=UTF-8 -Dpaper.playerconnection.keepalive=60 -Djava.awt.headless=true \
+-jar $SERVICE $OPTIONS"
+
+# Dirs and userdata to backup
+D2BACKUP[1]='survival/advancements'
+D2BACKUP[2]='survival/data'
+D2BACKUP[3]='survival/datapacks'
+D2BACKUP[4]='survival/level.dat'
+D2BACKUP[5]='survival/playerdata'
+D2BACKUP[6]='survival/stats'
+D2BACKUP[7]='survival/uid.dat'
+D2BACKUP[8]='survival_nether'
+#D2BACKUP[9]='survival_the_end'
+D2BACKUP[10]='plugins/Essentials/userdata/'
+D2BACKUP[11]='plugins/GriefPreventionData/Logs'
+D2BACKUP[12]='plugins/GriefPreventionData/ClaimData/'
+D2BACKUP[13]='plugins/GriefPreventionData/PlayerData/'
+D2BACKUP[14]='plugins/PvPManager/database.db'
+D2BACKUP[15]='plugins/GraviTree/PlayerData/'
+D2BACKUP[16]='plugins/GPFlags/flags.yml'
+D2BACKUP[17]='plugins/ChestShop/items.db'
+D2BACKUP[18]='plugins/ChestShop/users.db'
+
+ME=$(whoami)
+as_user() {
+  if [ "$ME" = "$USERNAME" ] ; then
+    bash -c "$1"
+  else
+    su -s /bin/bash - "$USERNAME" -c "$1"
+  fi
+}
+
+is_running() {
+  pgrep -u "$USERNAME" -f "$SERVICE" > /dev/null 2>&1
+}
+
+mc_start() {
+  if is_running
+  then
+    echo "$SERVICE is already running!"
+    return 0
+  else
+    echo "Starting $SERVICE..."
+    as_user "cd '$MCPATH' && screen -h $HISTORY -dmS $SCREENNAME $INVOCATION"
+    
+    # Wait up to 20 seconds for service to start (larger server)
+    for i in {1..20}; do
+      sleep 1
+      if is_running; then
+        echo "$SERVICE is now running."
+        return 0
+      fi
+    done
+    
+    echo "Error! Could not start $SERVICE!"
+    return 1
+  fi
+}
+
+mc_stop() {
+  if is_running
+  then
+    echo "Stopping $SERVICE"
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"say Сервер БУДЕТ ВЫКЛЮЧЕН через 10 секунд. Сохраняем мир...\"\015'"
+    sleep 10
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"kickall Плановый рестарт сервера. Соболезнуем...\"\015'"
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"save-all\"\015'"
+    sleep 3
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"stop\"\015'"
+    
+    # Wait up to 25 seconds for graceful shutdown (larger server)
+    for i in {1..25}; do
+      sleep 1
+      if ! is_running; then
+        echo "$SERVICE is stopped."
+        return 0
+      fi
+    done
+    
+    echo "Error! $SERVICE could not be stopped gracefully."
+    return 1
+  else
+    echo "$SERVICE was not running."
+    return 0
+  fi
+}
+
+mc_saveoff() {
+  if is_running
+  then
+    echo ""
+    echo "$SERVICE is running... suspending saves"
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"say Выполняется резервное копирование. Переключение в режим Только чтение...\"\015'"
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"save-off\"\015'"
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"save-all\"\015'"
+    sync
+    sleep 10
+  else
+    echo "$SERVICE is not running. Not suspending saves."
+  fi
+}
+
+mc_saveon() {
+  if is_running
+  then
+    echo ""
+    echo "$SERVICE is running... re-enabling saves"
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"save-on\"\015'"
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"say Резервное копирование успешно завершено. Переключение в обычный режим...\"\015'"
+  else
+    echo "$SERVICE is not running. Not resuming saves."
+ fi
+}
+
+mc_backup() {
+
+   mc_saveoff
+
+   umask 077
+   NOW=$(date "+%Y-%m-%d_%Hh%M")
+   BACKUP_FILE="$BACKUPPATH/${WORLD}_${NOW}.tar.gz"
+   BACKUP_FOLDER="$BACKUPPATH/${WORLD}_${NOW}"
+
+   echo ""
+   echo "Removing old backups..."
+   echo ""
+   find "$BACKUPPATH" -name "*.gz" -mtime +14 -exec rm {} \;
+
+   echo ""
+   echo "Creating TEMP backup folder"
+   echo ""
+   mkdir "$BACKUP_FOLDER"
+
+   echo ""
+   echo "Backup of the server database..."
+   echo ""
+{% endraw %}
+   mysqldump -u minecraft -p'{{ minecraft_db_password }}' -h localhost mob_server | gzip -9 > "${BACKUPPATH}/mob_server_${NOW}.dump.gz"
+{% raw %}
+   echo ""
+   echo "Backing up Survival world Safe zone..."
+   echo ""
+
+   mcaFolders[0]="survival/entities"
+   mcaFolders[1]="survival/poi"
+   mcaFolders[2]="survival/region"
+
+   for path in ${mcaFolders[*]}
+   do
+      echo "Folder ${path}"
+      found=0
+      for i in $(seq -61 9); do
+         for j in $(seq -32 17); do
+            filename="${path}/r.$i.$j.mca"
+            if [ -f "${MCPATH}/${filename}" ] ; then
+               as_user "rsync -a --relative ${MCPATH}/./${filename} ${BACKUP_FOLDER}"
+               ((found=found+1))
+            fi
+         done
+      done
+      echo "${found} out of $(ls ${MCPATH}/${path} | wc -l)"
+   done
+   echo "Marked to backup ${#mca2backups[@]} files..."
+
+   echo ""
+   echo "Backing up the rest of data..."
+   echo ""
+
+   for object in ${D2BACKUP[*]}
+   do
+      echo ""
+      echo -n "Copying ${object}"
+      as_user "rsync -a --relative ${MCPATH}/./${object} ${BACKUP_FOLDER}"
+   done
+
+   mc_saveon
+
+   echo ""
+   echo "Compressing backup..."
+   as_user "tar -zcvf ${BACKUP_FILE} ${BACKUP_FOLDER}"
+   chmod 0600 "${BACKUP_FILE}"
+   as_user "rm -rf ${BACKUP_FOLDER}"
+   echo "Done."
+}
+
+mc_backup_dynmap() {
+
+   umask 077
+   NOW=$(date "+%Y-%m-%d_%Hh%M")
+   BACKUP_FILE="$BACKUPPATH/${WORLD}_dynmap_${NOW}.tar"
+   DYNMAP_FOLDER="plugins/dynmap/web/tiles/survival"
+
+   echo ""
+   echo "Backing up Survival Dynmap Ftal tiles (Safe zone only)..."
+   echo ""
+
+   tiles2backups=()
+
+   echo ""
+   echo "Check hashmap files"
+   found=0
+   for i in $(seq -16 2); do
+      for j in $(seq -5 8); do
+         hashmap="${DYNMAP_FOLDER}/flat_${i}_${j}.hash"
+         if [ -f "${MCPATH}/${hashmap}" ] ; then
+            tiles2backups+=("$hashmap")
+            ((found=found+1))
+         fi
+      done
+   done
+   echo "${found} out of $(find ${MCPATH}/${DYNMAP_FOLDER} -maxdepth 1 -type f -exec ls -ld "{}" \; | wc -l)"
+
+   echo ""
+   echo "Check tiles folders"
+   found=0
+   for i in $(seq -16 2); do
+      for j in $(seq -5 8); do
+         tilesfolder="${DYNMAP_FOLDER}/flat/${i}_${j}"
+         if [ -d "${MCPATH}/${tilesfolder}" ] ; then
+            tiles2backups+=("$tilesfolder")
+            ((found=found+1))
+         fi
+      done
+   done
+   echo "${found} out of $(find ${MCPATH}/${DYNMAP_FOLDER}/flat -maxdepth 1 -type d -exec ls -ld "{}" \; | wc -l)"
+   echo ""
+   echo "Marked to backup ${#tiles2backups[@]} files and dirs..."
+
+   echo ""
+   echo "Packing to tar archive..."
+   echo ""
+   for object in ${tiles2backups[*]}; do
+      as_user "tar -C \"$MCPATH\" -rf \"$BACKUP_FILE\" $object"
+   done
+
+   echo ""
+   echo "Compressing backup..."
+   as_user "gzip -f \"$BACKUP_FILE\""
+   chmod 0600 "${BACKUP_FILE}.gz"
+   echo "Done."
+}
+
+mc_backup_user() {
+
+   umask 077
+   UUID="$1"
+   NOW=$(date "+%Y-%m-%d_%Hh%M")
+   BACKUP_FILE="/home/minecraft/backups/users/${UUID}_${NOW}.tar"
+   U2BACKUP[0]="plugins/Essentials/userdata/${UUID}.yml"
+   U2BACKUP[1]="survival/advancements/${UUID}.json"
+   U2BACKUP[2]="survival/playerdata/${UUID}.dat"
+   U2BACKUP[3]="survival/stats/${UUID}.json"
+
+   echo ""
+   echo "Backing up User with UUID=${UUID}..."
+   echo ""
+
+   for object in ${U2BACKUP[*]}
+   do
+      echo ""
+      echo -n "Backing up ${object}"
+      as_user "tar -C \"$MCPATH\" -rf \"$BACKUP_FILE\" $object"
+   done
+
+   echo ""
+   echo "Compressing user backup..."
+   as_user "gzip -f \"$BACKUP_FILE\""
+   chmod 0600 "${BACKUP_FILE}.gz"
+   echo "Done."
+}
+
+mc_command() {
+  command="$1"
+  if is_running
+  then
+    pre_log_len=$(wc -l "$MCPATH/logs/latest.log" | awk '{print $1}')
+    echo "$SERVICE is running... executing command"
+    as_user "screen -p 0 -S $SCREENNAME -X eval 'stuff \"$command\"\015'"
+    sleep .1
+    # print output
+    tail -n $(($(wc -l "$MCPATH/logs/latest.log" | awk '{print $1}') - pre_log_len)) "$MCPATH/logs/latest.log"
+  else
+    echo "$SERVICE is not running."
+    return 1
+  fi
+}
+
+# The main events processor
+case "$1" in
+  start)
+    mc_start
+    ;;
+  stop)
+    mc_stop
+    ;;
+  restart)
+    mc_stop
+    mc_start
+    ;;
+  backup)
+    mc_backup
+    ;;
+  dynmapbackup)
+    mc_backup_dynmap
+    ;;
+  userbackup)
+    if [ $# -gt 1 ]; then
+      shift
+      mc_backup_user "$*"
+    else
+      echo "Must specify user UUID"
+      exit 1
+    fi
+    ;;
+  status)
+    if is_running
+    then
+      echo "$SERVICE is running."
+      exit 0
+    else
+      echo "$SERVICE is not running."
+      exit 3
+    fi
+    ;;
+  command)
+    if [ $# -gt 1 ]; then
+      shift
+      mc_command "$*"
+    else
+      echo "Must specify server command (try 'help'?)"
+      exit 1
+    fi
+    ;;
+
+  *)
+  echo "Usage: $0 {start|stop|backup|userbackup|dynmapbackup|status|restart|command \"server command\"}"
+  exit 1
+  ;;
+esac
+exit $?
+{% endraw %}
