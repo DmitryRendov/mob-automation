@@ -3,6 +3,8 @@ temp_folder: /tmp
 packages:
   - screen
   - git
+  - python3-boto3
+  - python3-botocore
 
 # Minecraft server configuration
 # Available modes: setup, update, reset
@@ -48,6 +50,7 @@ bucket: mob-server-backups
 minecraft_db_name: mob_server
 minecraft_db_user: minecraft
 server_db_src: "{{ server_env }}/{{ server_version }}/latest/survival.dump.tar.gz"
+keep_mysql_dump: false
 
 # Server region sources URLs
 server_survival_src: 
@@ -58,6 +61,8 @@ server_survival_src:
 server_lobby_src: "{{ server_env }}/{{ server_version }}/latest/lobby.tar.gz"
 server_vanilla_src: "{{ server_env }}/{{ server_version }}/latest/vanilla.tar.gz"
 server_creative_src: "{{ server_env }}/{{ server_version }}/latest/creative.tar.gz"
+keep_server_sources: false
+keep_dynmap_tiles: false
 
 service_restart_cooldown: 10
 service_stop_cooldown: 10
