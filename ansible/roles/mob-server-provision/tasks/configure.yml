@@ -14,7 +14,7 @@
       line: '  password="{{ minecraft_db_password }}"'
     
     - path: "bungeecord/plugins/LuckPerms/config.yml"
-      regexp: '^\s*password:'
+      regexp: '^  password:'
       line: "  password: '{{ minecraft_db_password }}'"
     
     - path: "bungeecord/plugins/SkinsRestorer/config.yml"
@@ -26,7 +26,7 @@
       line: '  password: {{ minecraft_db_password }}'
     
     - path: "creative/plugins/LuckPerms/config.yml"
-      regexp: '^\s*password:'
+      regexp: '^  password:'
       line: "  password: '{{ minecraft_db_password }}'"
     
     - path: "creative/plugins/PlotSquared/config/storage.yml"
@@ -46,7 +46,7 @@
       line: 'BotToken: "{{ discord_bot_token }}"'
     
     - path: "lobby/plugins/LuckPerms/config.yml"
-      regexp: '^\s*password:'
+      regexp: '^  password:'
       line: "  password: '{{ minecraft_db_password }}'"
     
     - path: "survival/plugins/EssentialsGeoIP/config.yml"
@@ -58,7 +58,7 @@
       line: '  password: {{ minecraft_db_password }}'
     
     - path: "survival/plugins/LuckPerms/config.yml"
-      regexp: '^\s*password:'
+      regexp: '^  password:'
       line: "  password: '{{ minecraft_db_password }}'"
     
     - path: "survival/plugins/WorldGuard/config.yml"
@@ -78,7 +78,7 @@
       line: '  password: {{ minecraft_db_password }}'
     
     - path: "vanilla/plugins/LuckPerms/config.yml"
-      regexp: '^\s*password:'
+      regexp: '^  password:'
       line: "  password: '{{ minecraft_db_password }}'"
 
     - path: "survival/plugins/Jobs/generalConfig.yml"
