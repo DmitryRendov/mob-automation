@@ -21,7 +21,8 @@ MAXHEAP={{ servers_configuration.bungeecord.memory }}
 MINHEAP={{ servers_configuration.bungeecord.memory }}
 HISTORY=512
 INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} \
--Dio.netty.recycler.maxCapacity.default=20000 -XX:G1HeapRegionSize=4M -Dfile.encoding=UTF-8 \
+-Dio.netty.recycler.maxCapacity.default=20000 -XX:G1HeapRegionSize=4M \
+-Dfile.encoding=UTF-8 -Djava.awt.headless=true \
 -jar $SERVICE"
 
 ME=$(whoami)

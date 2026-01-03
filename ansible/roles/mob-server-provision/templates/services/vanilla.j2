@@ -29,7 +29,7 @@ INVOCATION="java -Xmx${MAXHEAP} -Xms${MINHEAP} -XX:ParallelGCThreads=$CPU_COUNT 
 -XX:+DisableExplicitGC -XX:TargetSurvivorRatio=90 -XX:G1NewSizePercent=50 \
 -XX:G1MaxNewSizePercent=80 -XX:InitiatingHeapOccupancyPercent=10 \
 -XX:G1MixedGCLiveThresholdPercent=50 \
--XX:+AlwaysPreTouch -Dfile.encoding=UTF-8 \
+-XX:+AlwaysPreTouch -Dfile.encoding=UTF-8  -Djava.awt.headless=true \
 -XX:+HeapDumpOnOutOfMemoryError \
 -jar $SERVICE $OPTIONS"
 
