@@ -1,14 +1,20 @@
 ---
 
-- include: packages.yml
+- include_tasks: packages.yml
+  tags: [provision, packages]
 
-- include: repo.yml
+- include_tasks: repo.yml
+  tags: [provision, repo]
 
-- include: configure.yml
+- include_tasks: configure.yml
+  tags: [provision, configure]
 
-- include: worlds.yml
+- include_tasks: worlds.yml
+  tags: [provision, worlds]
 
-- include: database.yml
+- include_tasks: database.yml
+  tags: [provision, database]
 
-- include: services.yml
+- include_tasks: services.yml
+  tags: [provision, services]
 

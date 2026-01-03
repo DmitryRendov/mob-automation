@@ -22,7 +22,7 @@ Install common packages, MySQL, and Java:
 
 ```sh
 $ ansible-playbook -i ./inventory/live common.yml -e "user=minecraft env=mobserver-vps" -kK -v
-$ ansible-playbook -i ./inventory/live services.yml -e "user=minecraft env=mobserver-vps wireguard_enabled=true"-e "@local.vars.yml" -v
+$ ansible-playbook -i ./inventory/live services.yml -e "user=minecraft env=mobserver-vps wireguard_enabled=true" -e "@local.vars.yml" -v
 $ ansible-playbook -i ./inventory/live java-oracle.yml -e "user=minecraft env=mobserver-vps" -v
 $ ansible-playbook -i ./inventory/live mariadb.yml -e "user=minecraft env=mobserver-vps"-e "@local.vars.yml" -v
 ```
@@ -83,11 +83,23 @@ keep_dynmap_tiles: true
 
 In case of a new release deployment - you need to merge all the changes to [mob-server] repo and play the provision playbook with the following options:
 ```sh
-ansible-playbook -i ./inventory/live mob-server-provision.yml -e "user=minecraft env=mobserver-vps mode=update" -v
+ansible-playbook -i ./inventory/live mob-server-provision.yml -e "user=minecraft env=mobserver-vps" -e "@local.vars.yml" -v
 ```
-where:
-- mode=setup - means brand new server setup, using original backups from S3
-- mode=update - just update the server as part of the major upgrade
+
+You can skip downloading server sources and MySQL dump by adding the following options to the command:
+```sh
+ansible-playbook -i ./inventory/live mob-server-provision.yml -e "user=minecraft env=mobserver-vps keep_server_sources=false keep_mysql_dump=false" -e "@local.vars.yml" -v
+```
+
+Also, you can skip downloading dynmap tiles by adding the following option:
+```sh
+ansible-playbook -i ./inventory/live mob-server-provision.yml -e "user=minecraft env=mobserver-vps keep_dynmap_tiles=false" -e "@local.vars.yml" -v
+```
+
+Using Ansible tags, you can run only specific parts of the provisioning process. For example, to update only the MOB worlds and the database, run:
+```sh
+ansible-playbook -i ./inventory/live mob-server-provision.yml -e "user=minecraft env=mobserver-vps" -e "@local.vars.yml" --skip-tags "worlds,database" -v
+```
 
 ### MOB site deployment
 
