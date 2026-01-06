@@ -9,5 +9,6 @@ artifactory     ansible_ssh_host=192.168.56.123
 
 [mob]
 mobserver       ansible_ssh_host=192.168.56.101
+mobserver-local ansible_ssh_host=192.168.56.102
 mobsite         ansible_ssh_host=192.168.56.123
 
