@@ -1,4 +1,4 @@
 ---
 
 - name: Reload environment variables
-  shell: source /etc/environment
+  shell: bash -c "source /etc/environment"

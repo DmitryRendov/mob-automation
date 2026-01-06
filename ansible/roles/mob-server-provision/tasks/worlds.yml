@@ -82,21 +82,21 @@
     remote_src: yes
   when: dynmap_download.changed
 
-# - name: Remove downloaded server source archives
-#   file:
-#     path: "{{ server_folder }}/{{ item.name }}/{{ item.archive }}"
-#     state: absent
-#   loop:
-#     - { name: "lobby", archive: "lobby.tar.gz" }
-#     - { name: "survival", archive: "survival.tar.gz" }
-#     - { name: "survival", archive: "survival_nether.tar.gz" }
-#     - { name: "survival", archive: "survival_the_end.tar.gz" }
-#     - { name: "vanilla", archive: "vanilla.tar.gz" }
-#     - { name: "creative", archive: "creative.tar.gz" }
-#   when: s3_downloads.changed
+- name: Remove downloaded server source archives
+  file:
+    path: "{{ server_folder }}/{{ item.name }}/{{ item.archive }}"
+    state: absent
+  loop:
+    - { name: "lobby", archive: "lobby.tar.gz" }
+    - { name: "survival", archive: "survival.tar.gz" }
+    - { name: "survival", archive: "survival_nether.tar.gz" }
+    - { name: "survival", archive: "survival_the_end.tar.gz" }
+    - { name: "vanilla", archive: "vanilla.tar.gz" }
+    - { name: "creative", archive: "creative.tar.gz" }
+  when: s3_downloads.changed and keep_server_sources | default(false)
 
-# - name: Remove downloaded dynmap tiles archive
-#   file:
-#     path: "{{ server_folder }}/survival/plugins/dynmap/web/tiles.tar.gz"
-#     state: absent
-#   when: dynmap_download.changed
+- name: Remove downloaded dynmap tiles archive
+  file:
+    path: "{{ server_folder }}/survival/plugins/dynmap/web/tiles.tar.gz"
+    state: absent
+  when: dynmap_download.changed and keep_dynmap_tiles | default(false)

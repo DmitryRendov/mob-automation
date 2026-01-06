@@ -11,8 +11,8 @@ mariadb_collation: utf8mb4_unicode_ci
 # Fine tuning parameters
 mariadb_max_connections: 200
 mariadb_connect_timeout: 5
-mariadb_wait_timeout: 600
-mariadb_max_allowed_packet: 16M
+mariadb_wait_timeout: 900
+mariadb_max_allowed_packet: 128M
 mariadb_thread_cache_size: 128
 mariadb_sort_buffer_size: 4M
 mariadb_bulk_insert_buffer_size: 16M
