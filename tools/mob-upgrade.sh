@@ -3,9 +3,9 @@
 server_path=/home/minecraft/mob-servers
 src_folder="${server_path}/rc-scripts/jar"
 
-server_ver="1.21.1"
-lp_ver="5.4.145"
-we_ver="7.4.0"
+server_ver="1.21.10"
+lp_ver="5.5.22"
+we_ver="7.3.19"
 wg_ver="7.1.0"
 is_ver="2.9.12a"
 

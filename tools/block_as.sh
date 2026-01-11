@@ -36,14 +36,20 @@ for userip in $ALLOW_IPs; do
 done
 
 # Allow TCPShield IPs
-curl -s https://tcpshield.com/v4/ | while read -r ip; do
-  $IPT -A NET2BAN -s $ip -j ACCEPT
-done
+#curl -s https://tcpshield.com/v4/ | while read -r ip; do
+#  $IPT -A NET2BAN -s $ip -j ACCEPT
+#done
 
 # Allow for some user by their MACs
 for mac in $ALLOW_MACs; do
   $IPT -A NET2BAN -m mac --mac-source $mac -j ACCEPT
 done
+
+# SYN rate limiting for Minecraft port with logging
+$IPT -A NET2BAN -p tcp --syn --dport 25565 -m limit --limit 10/second --limit-burst 20 -j RETURN
+$IPT -A NET2BAN -p tcp --syn --dport 25565 -j LOG --log-prefix "SYN flood attempt: " --log-level 4
+$IPT -A NET2BAN -p tcp --syn --dport 25565 -j DROP
+
 
 # Add some logging
 $IPT -A NET2BAN -m limit --limit 5/second -j LOG --log-prefix "Banned Minecraft: " --log-level 4
@@ -64,7 +70,7 @@ for userip in $BANNED_IPs; do
   $IPT -A INPUT -i $NETWORK -s $userip -p tcp --dport 25565 -j NET2BAN
 done
 
-# Forward ALL the hosts to the MC chain
+# Forward ALL the hosts to the MC chain - ONLY when TCPShield is used
 $IPT -A INPUT -i $NETWORK -p tcp --dport 25565 -j NET2BAN
 
 echo "Done."
