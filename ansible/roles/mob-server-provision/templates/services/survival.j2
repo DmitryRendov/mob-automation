@@ -153,13 +153,35 @@ mc_backup() {
 
    umask 077
    NOW=$(date "+%Y-%m-%d_%Hh%M")
-   BACKUP_FILE="$BACKUPPATH/${WORLD}_${NOW}.tar.gz"
+   MONTH=$(date "+%Y-%m")
+   DAY=$(date "+%d")
    FILELIST="/tmp/backup_filelist_${NOW}.txt"
+   SNAR_DIR="$BACKUPPATH/.snar"
+   SNAR_FILE="$SNAR_DIR/${MONTH}.snar"
+
+   # Create SNAR directory if it doesn't exist
+   mkdir -p "$SNAR_DIR"
 
    echo ""
-   echo "Removing old backups..."
+   echo "Removing old backups (older than 14 days)..."
    echo ""
-   find "$BACKUPPATH" -name "*.gz" -mtime +14 -exec rm {} \;
+   find "$BACKUPPATH" -maxdepth 1 -name "${WORLD}_*.tar.gz" -mtime +14 -exec rm {} \;
+
+   # Determine if this is a full or incremental backup
+   IS_FULL=0
+   if [ "$DAY" = "01" ]; then
+      IS_FULL=1
+      echo "First day of month - Creating FULL backup..."
+      # Clean up old SNAR file for new month
+      rm -f "$SNAR_FILE"
+   else
+      if [ ! -f "$SNAR_FILE" ]; then
+         IS_FULL=1
+         echo "No previous backup found this month - Creating FULL backup..."
+      else
+         echo "Creating INCREMENTAL backup..."
+      fi
+   fi
 
    echo ""
    echo "Backup of the server database..."
@@ -187,13 +209,23 @@ mc_backup() {
    } > "$FILELIST"
 
    echo ""
-   echo "Creating backup archive..."
-   as_user "tar -C \"$MCPATH\" -zcvf \"$BACKUP_FILE\" -T \"$FILELIST\" "
+   if [ $IS_FULL -eq 1 ]; then
+      BACKUP_FILE="$BACKUPPATH/${WORLD}_${NOW}_full.tar.gz"
+      echo "Creating FULL backup archive..."
+      as_user "tar -C \"$MCPATH\" --listed-incremental=\"$SNAR_FILE\" -zcvf \"$BACKUP_FILE\" -T \"$FILELIST\" > /dev/null 2>&1"
+   else
+      BACKUP_FILE="$BACKUPPATH/${WORLD}_${NOW}_incr.tar.gz"
+      echo "Creating INCREMENTAL backup archive..."
+      as_user "tar -C \"$MCPATH\" --listed-incremental=\"$SNAR_FILE\" -zcvf \"$BACKUP_FILE\" -T \"$FILELIST\" > /dev/null 2>&1"
+   fi
+
    chmod 0600 "${BACKUP_FILE}"
    rm -f "$FILELIST"
 
    mc_saveon
 
+   echo "Backup complete: $(basename \"$BACKUP_FILE\")"
+   echo "Database dump: mob_server_${NOW}.dump.gz"
    echo "Done."
 }
 
