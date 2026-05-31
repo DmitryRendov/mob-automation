@@ -53,11 +53,18 @@ Then deploy Ollama and Open WebUI (skip common if already done by editing the pl
 
 Pulled automatically when `ollama_pull_models: true` (default):
 
-| Model | Tag | Approx. size |
-|-------|-----|--------------|
-| Mistral 7B Instruct | `mistral:7b-instruct-q4_K_M` | ~4.4 GB |
-| Llama 3.1 8B Instruct | `llama3.1:8b-instruct-q4_K_M` | ~4.9 GB |
-| Qwen 2.5 7B Instruct | `qwen2.5:7b-instruct-q4_K_M` | ~4.4 GB |
+| Role | Tag | Approx. size |
+|------|-----|--------------|
+| General chat (EN/RU) | `qwen2.5:7b-instruct-q4_K_M` | ~4.4 GB |
+| General chat | `mistral:7b-instruct-q4_K_M` | ~4.4 GB |
+| General chat | `llama3.1:8b-instruct-q4_K_M` | ~4.9 GB |
+| Russian assistant | `bambucha/saiga-llama3:8b` | ~4.9 GB |
+| Vision (image understanding) | `qwen2.5vl:7b-q4_K_M` | ~6.0 GB |
+| Vision (lightweight) | `moondream:1.8b-v2-q4_K_M` | ~1.8 GB |
+
+Only one model is loaded in RAM at a time; all can remain on disk (~27 GB total download).
+
+`qwen2.5vl` requires **Ollama 0.7+**. Vision models analyze images in Open WebUI — they do not generate images (Ollama image gen is macOS-only for now).
 
 Skip pre-pulling on slow links:
 
@@ -66,10 +73,12 @@ ansible-playbook -i ./inventory/live ollama.yml \
   -e "user=minecraft env=ollama ollama_pull_models=false" -v
 ```
 
-Pull manually on the host:
+Pull or test manually on the host:
 
 ```bash
-ollama pull mistral:7b-instruct-q4_K_M
+ollama pull qwen2.5:7b-instruct-q4_K_M
+ollama run bambucha/saiga-llama3:8b "Объясни простыми словами, как работает VPN"
+ollama run qwen2.5vl:7b-q4_K_M "Опиши изображение на русском" --image photo.jpg
 ```
 
 ## Access
@@ -100,8 +109,9 @@ ollama_env:
 
 # Custom model list
 ollama_models:
-  - mistral:7b-instruct-q4_K_M
   - qwen2.5:7b-instruct-q4_K_M
+  - bambucha/saiga-llama3:8b
+  - qwen2.5vl:7b-q4_K_M
 
 # Open WebUI port
 openwebui_port: 8080
