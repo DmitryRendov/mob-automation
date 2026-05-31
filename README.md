@@ -4,6 +4,7 @@ Automation repo for the MOB project
 - Ansible
 - MOB game server (screen approach)
 - MOB web-site
+- Ollama + OpenWebUI
 
 Written in yaml code for [Ansible]
 
@@ -107,6 +108,18 @@ MOB site is a part of game server and located in this GitHub repo - [mob-site]
 ```sh
 $ ansible-playbook -i ./inventory/live mob-site-deploy.yml -e "user=minecraft env=mobsite-server" -v
 ```
+
+### Ollama + Open WebUI
+
+Deploy Ollama and Open WebUI on the LLM host (includes Docker and Intel GPU packages via `group_vars/llm.yml`):
+
+```sh
+$ ansible-playbook -i ./inventory/live ollama.yml -e "user=minecraft env=ollama" -v
+```
+
+See [ansible/roles/ollama/README.md](ansible/roles/ollama/README.md) for models, tuning, and access details.
+
+Open WebUI: `http://<ollama-host>:8080` · Ollama API: `http://<ollama-host>:11434`
 
 ### License
 ----
