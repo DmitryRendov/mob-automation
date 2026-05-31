@@ -1,10 +1,14 @@
 ---
 
+# Debian/Ubuntu use "ssh"; RHEL/CentOS use "sshd"
+sshd_service_name: ssh
+
 ansible_ssh_key:
   - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFtzcxdPSMZYg2jutiuS8Nvt/VzjY6t6kWZyJf7kjSAm drendov+ovh@gmail.com'
 
 custom_allowed_ports:
     - 50223
+    - 1222
     - 80
     - 443
 
