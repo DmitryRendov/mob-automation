@@ -1,0 +1,111 @@
+---
+- name: Add Intel GPU apt repository
+  when:
+    - ansible_os_family == "Debian"
+    - ansible_distribution == "Ubuntu"
+    - intel_gpu_add_repo | default(true)
+  tags:
+    - intel_gpu
+  block:
+    - name: Ensure apt keyrings directory exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Add Intel GPU GPG key
+      shell: >
+        curl -fsSL https://repositories.intel.com/gpu/intel-graphics.key
+        | gpg --dearmor -o /etc/apt/keyrings/intel-graphics.gpg
+      args:
+        creates: /etc/apt/keyrings/intel-graphics.gpg
+
+    - name: Add Intel GPU apt repository
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu {{ ansible_distribution_release }} lts/2350 unified"
+        state: present
+        filename: intel-gpu
+      register: intel_gpu_repo
+
+    - name: Update apt cache after Intel GPU repo change
+      apt:
+        update_cache: yes
+      when: intel_gpu_repo is changed
+
+- name: Install base Intel GPU packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ intel_gpu_packages_base }}"
+  register: intel_gpu_base_install
+  failed_when: false
+  tags:
+    - intel_gpu
+
+- name: Install Intel GPU driver stack from Intel repo
+  apt:
+    name: "{{ intel_gpu_packages_intel }}"
+    state: present
+    update_cache: yes
+  when:
+    - ansible_distribution == "Ubuntu"
+    - intel_gpu_add_repo | default(true)
+    - intel_gpu_packages_intel | length > 0
+  register: intel_gpu_intel_install
+  failed_when: false
+  tags:
+    - intel_gpu
+
+- name: Install Ubuntu OpenCL fallback packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ intel_gpu_packages_ubuntu_fallback }}"
+  when:
+    - intel_gpu_intel_install is defined
+    - intel_gpu_intel_install.failed | default(false)
+  register: intel_gpu_fallback_install
+  failed_when: false
+  tags:
+    - intel_gpu
+
+- name: Install optional Intel GPU packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ intel_gpu_packages_optional }}"
+  register: intel_gpu_optional_install
+  failed_when: false
+  tags:
+    - intel_gpu
+
+- name: Summarize Intel GPU package installation
+  debug:
+    msg: |
+      Base: {{ intel_gpu_base_install.results | map(attribute='item') | list | join(', ') }}
+      Intel repo stack: {{ 'ok' if not (intel_gpu_intel_install.failed | default(true)) else 'failed — ' + (intel_gpu_intel_install.msg | default('see apt output')) }}
+      Fallback OpenCL: {{ 'attempted' if (intel_gpu_intel_install.failed | default(false)) else 'skipped' }}
+  tags:
+    - intel_gpu
+
+- name: Warn when Intel GPU driver stack could not be installed
+  debug:
+    msg: >-
+      intel-level-zero-gpu failed to install (common on older Intel iGPUs without libigc1 in apt).
+      OpenCL fallback may still work. Ollama CPU inference is unaffected.
+      Set intel_gpu_add_repo=false to use only Ubuntu packages, or install drivers manually.
+  when: intel_gpu_intel_install.failed | default(false)
+  tags:
+    - intel_gpu
+
+- name: Add user to render group for GPU access
+  user:
+    name: "{{ user }}"
+    groups: render
+    append: yes
+  when: >
+    (intel_gpu_base_install.results | rejectattr('failed', 'equalto', true) | list | length > 0)
+    or not (intel_gpu_intel_install.failed | default(true))
+    or (intel_gpu_fallback_install.results | default([]) | rejectattr('failed', 'equalto', true) | list | length > 0)
+  tags:
+    - intel_gpu

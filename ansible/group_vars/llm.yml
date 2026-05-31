@@ -1,0 +1,8 @@
+---
+docker_enabled: true
+intel_gpu_enabled: false
+
+custom_allowed_ports:
+    - 1222
+    - 11434
+    - 8080

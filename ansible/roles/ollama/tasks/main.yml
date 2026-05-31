@@ -1,0 +1,55 @@
+---
+- name: Build effective Ollama environment
+  set_fact:
+    ollama_effective_env: "{{ ollama_env | combine(ollama_intel_gpu_env if (intel_gpu_enabled | default(false)) else {}) }}"
+
+- name: Install Ollama
+  shell: curl -fsSL {{ ollama_install_url }} | sh
+  args:
+    creates: /usr/local/bin/ollama
+
+- name: Ensure ollama systemd drop-in directory exists
+  file:
+    path: /etc/systemd/system/ollama.service.d
+    state: directory
+    mode: "0755"
+
+- name: Configure Ollama service environment
+  template:
+    src: override.conf.j2
+    dest: /etc/systemd/system/ollama.service.d/override.conf
+    mode: "0644"
+  notify: Restart ollama service
+
+- name: Ensure Ollama service is enabled and running
+  systemd:
+    name: "{{ ollama_service_name }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: Wait for Ollama API
+  uri:
+    url: "http://127.0.0.1:11434"
+    status_code: 200
+  register: ollama_api
+  until: ollama_api.status == 200
+  retries: 12
+  delay: 5
+
+- name: Check which models are already present
+  command: ollama list
+  register: ollama_list
+  changed_when: false
+  when: ollama_pull_models | bool
+
+- name: Pull configured models
+  command: ollama pull {{ item }}
+  loop: "{{ ollama_models }}"
+  when:
+    - ollama_pull_models | bool
+    - item not in ollama_list.stdout
+  register: ollama_pull
+  changed_when: ollama_pull.rc == 0
+  async: 3600
+  poll: 30

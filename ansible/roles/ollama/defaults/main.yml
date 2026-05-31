@@ -1,0 +1,36 @@
+---
+# Ollama service tuning for a 16 GB RAM host with Intel iGPU.
+# Quantized 7B–8B models fit comfortably with OLLAMA_MAX_LOADED_MODELS=1.
+
+ollama_install_url: https://ollama.com/install.sh
+
+ollama_service_name: ollama
+ollama_models_dir: /usr/share/ollama/.ollama/models
+
+# CPU thread count; 0 lets Ollama auto-detect.
+ollama_num_threads: "{{ ansible_processor_vcpus | default(4) }}"
+
+ollama_env:
+  OLLAMA_HOST: "0.0.0.0:11434"
+  OLLAMA_MAX_LOADED_MODELS: "1"
+  OLLAMA_NUM_PARALLEL: "1"
+  OLLAMA_KEEP_ALIVE: "5m"
+  OLLAMA_FLASH_ATTENTION: "1"
+
+# Extra env vars applied when intel_gpu_enabled is true on the host.
+# Official Ollama runs on CPU; these prepare the host for IPEX-LLM builds
+# and document the tuning used with Intel GPU backends.
+ollama_intel_gpu_env:
+  OLLAMA_NUM_GPU: "999"
+  ZES_ENABLE_SYSMAN: "1"
+  SYCL_CACHE_PERSISTENT: "1"
+  SYCL_PI_LEVEL_ZERO_USE_IMMEDIATE_COMMANDLISTS: "1"
+  ONEAPI_DEVICE_SELECTOR: "level_zero:0"
+
+ollama_pull_models: true
+
+# Q4_K_M variants — good quality/size trade-off on 16 GB RAM.
+ollama_models:
+  - mistral:7b-instruct-q4_K_M
+  - llama3.1:8b-instruct-q4_K_M
+  - qwen2.5:7b-instruct-q4_K_M

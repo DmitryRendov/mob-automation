@@ -21,3 +21,13 @@
 
 - name: Include firewall configuration
   include_tasks: firewall.yml
+
+- name: Include Docker installation
+  include_tasks: docker.yml
+  when: docker_enabled | default(false)
+
+- name: Include Intel GPU packages
+  include_tasks: intel_gpu.yml
+  when: intel_gpu_enabled | default(false)
+  tags:
+    - intel_gpu

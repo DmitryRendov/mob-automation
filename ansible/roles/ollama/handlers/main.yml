@@ -1,0 +1,6 @@
+---
+- name: Restart ollama service
+  systemd:
+    name: "{{ ollama_service_name }}"
+    state: restarted
+    daemon_reload: yes

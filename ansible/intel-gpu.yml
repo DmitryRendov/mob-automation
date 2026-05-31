@@ -1,0 +1,12 @@
+# Install Intel GPU compute packages (optional)
+# ansible-playbook -i ./inventory/live intel-gpu.yml -e "user=minecraft env=ollama" -v
+
+- hosts: "{{ env }}"
+  user: "{{ user }}"
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  tasks:
+    - import_role:
+        name: common
+        tasks_from: intel_gpu
