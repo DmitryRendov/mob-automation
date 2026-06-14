@@ -1,0 +1,52 @@
+---
+
+- name: Ensure media target directory exists
+  file:
+    path: "{{ site_media_target }}"
+    state: directory
+    mode: '0775'
+    owner: "{{ site_user }}"
+    group: www-data
+
+- name: Check whether media directory already has content
+  find:
+    paths: "{{ site_media_target }}"
+    file_type: any
+  register: media_existing
+
+- name: Download MOB-site media archive from AWS S3
+  become: yes
+  become_user: "{{ site_user }}"
+  aws_s3:
+    bucket: "{{ site_s3_bucket }}"
+    object: "{{ site_media }}"
+    dest: "{{ target_path }}/mob_site_media.tar.gz"
+    mode: get
+    aws_access_key: "{{ aws.access_key }}"
+    aws_secret_key: "{{ aws.secret_key }}"
+  register: media_download
+  when: media_existing.matched == 0
+
+- name: Unpack media archive (contains a media/ folder) into the mob directory
+  unarchive:
+    src: "{{ target_path }}/mob_site_media.tar.gz"
+    dest: "{{ site_media_target | dirname }}"
+    remote_src: yes
+    owner: "{{ site_user }}"
+    group: www-data
+  when: media_existing.matched == 0
+
+- name: Ensure media ownership is correct
+  file:
+    path: "{{ site_media_target }}"
+    state: directory
+    recurse: yes
+    owner: "{{ site_user }}"
+    group: www-data
+  when: media_existing.matched == 0
+
+- name: Remove the downloaded media archive
+  file:
+    path: "{{ target_path }}/mob_site_media.tar.gz"
+    state: absent
+  when: media_existing.matched == 0 and not (keep_media_archive | default(false))

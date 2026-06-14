@@ -4,6 +4,15 @@
 minecraft_db_name: mob_server
 minecraft_db_user: minecraft
 
+# Which databases this role should provision
+mariadb_create_minecraft_db: true
+mariadb_create_site_db: false
+
+# MOB site database configuration (used when mariadb_create_site_db is true)
+site_db_name: mob_site
+site_db_user: mob_user
+site_db_password: ""
+
 # Character set configuration
 mariadb_character_set: utf8mb4
 mariadb_collation: utf8mb4_unicode_ci

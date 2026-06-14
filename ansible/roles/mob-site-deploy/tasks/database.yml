@@ -1,31 +1,63 @@
 ---
 
-- name: Remove the game site database
-  mysql_db: name={{ site_db_name }} state=absent
+- name: Check existing table count in the site database
+  mysql_query:
+    query: "SELECT COUNT(*) AS cnt FROM information_schema.tables WHERE table_schema = '{{ site_db_name }}'"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  register: site_db_tables
 
-- name: Create a database for the site
-  mysql_db: name={{ site_db_name }} state=present
-
-- name: Force custom password using if it's set as a playbook variable
+- name: Determine whether the site database is empty
   set_fact:
-    site_db_users:
-      - name: django
-        host: localhost
-        pass: "{{ password }}"
-        priv: "*.*:ALL"
-  when: password is defined
+    site_db_is_empty: "{{ (site_db_tables.query_result[0][0].cnt | int) == 0 }}"
 
-- name: Create the database users
-  mysql_user: name={{ item.name }}  password={{ item.pass|default("111") }}
-              priv={{ item.priv|default("*.*:ALL") }} state=present host={{ item.host | default("localhost") }}
-  with_items: "{{ site_db_users }}"
-  when: site_db_users|lower() != 'none'
-
-- name: Downloading MOB-site latest MySQL dump from Dropbox
-  get_url:
-    url="{{ site_dump_src }}"
-    dest="{{ target_path }}"
+- name: Download MOB-site MySQL dump archive from AWS S3
+  become: yes
+  become_user: "{{ site_user }}"
+  aws_s3:
+    bucket: "{{ site_s3_bucket }}"
+    object: "{{ site_db_src }}"
+    dest: "{{ target_path }}/mob_site_dump.tar.gz"
+    mode: get
+    aws_access_key: "{{ aws.access_key }}"
+    aws_secret_key: "{{ aws.secret_key }}"
   register: mysql_dump
+  when: site_db_is_empty
 
-- name: Restore it to the site database
-  mysql_db: name={{ site_db_name }} state=import target={{ mysql_dump.dest }}
+- name: Create temporary directory for the extracted dump
+  file:
+    path: "{{ target_path }}/mob_site_dump"
+    state: directory
+    mode: '0755'
+  when: site_db_is_empty
+
+- name: Unpack the MySQL dump archive
+  unarchive:
+    src: "{{ target_path }}/mob_site_dump.tar.gz"
+    dest: "{{ target_path }}/mob_site_dump"
+    remote_src: yes
+  when: site_db_is_empty
+
+- name: Locate the extracted dump file
+  find:
+    paths: "{{ target_path }}/mob_site_dump"
+    recurse: yes
+    file_type: file
+  register: dump_files
+  when: site_db_is_empty
+
+- name: Restore the dump into the site database
+  mysql_db:
+    name: "{{ site_db_name }}"
+    state: import
+    target: "{{ dump_files.files[0].path }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+  when: site_db_is_empty
+
+- name: Remove the downloaded dump archive and extracted files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ target_path }}/mob_site_dump.tar.gz"
+    - "{{ target_path }}/mob_site_dump"
+  when: site_db_is_empty and not (keep_mysql_dump | default(false))

@@ -34,6 +34,10 @@
 - include_tasks: fine-tunning.yml
 
 - include_tasks: minecraft.yml
+  when: mariadb_create_minecraft_db | default(true)
+
+- include_tasks: site.yml
+  when: mariadb_create_site_db | default(false)
 
 - include_tasks: disable-sock.yml
   when: mysql_disable_unix_socket_auth
