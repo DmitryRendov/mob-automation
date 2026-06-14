@@ -1,0 +1,12 @@
+# Setup Ollama and Open WebUI on LLM hosts
+# ansible-playbook -i ./inventory/live ollama.yml -e "user=minecraft env=ollama" -v
+
+- hosts: "{{ env }}"
+  user: "{{ user }}"
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  roles:
+    - common
+    - ollama
+    - openwebui

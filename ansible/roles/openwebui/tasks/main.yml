@@ -1,0 +1,41 @@
+---
+- name: Create Open WebUI data directory
+  file:
+    path: "{{ openwebui_data_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Check if Open WebUI container is running
+  command: docker ps --filter name=^{{ openwebui_name }}$ --filter status=running --format {% raw %}'{{.Names}}'{% endraw %}
+  register: openwebui_ps
+  changed_when: false
+  failed_when: false
+
+- name: Deploy Open WebUI container
+  when: openwebui_ps.stdout != openwebui_name
+  block:
+    - name: Pull Open WebUI image
+      command: docker pull {{ openwebui_image }}
+      changed_when: false
+
+    - name: Remove existing Open WebUI container
+      command: docker rm -f {{ openwebui_name }}
+      failed_when: false
+      changed_when: false
+
+    - name: Start Open WebUI container
+      shell: |
+        docker run -d \
+          --name {{ openwebui_name }} \
+          --restart always \
+          --network host \
+          --log-driver {{ openwebui_log_driver }} \
+          --log-opt max-size={{ openwebui_log_opt['max-size'] }} \
+          --log-opt max-file={{ openwebui_log_opt['max-file'] }} \
+          -v {{ openwebui_data_dir }}:/app/backend/data \
+          {% for item in openwebui_env | dict2items %}
+          -e {{ item.key }}={{ item.value }} \
+          {% endfor %}
+          {{ openwebui_image }}
+      args:
+        executable: /bin/bash

@@ -1,12 +1,46 @@
 ---
 
+# Debian/Ubuntu use "ssh"; RHEL/CentOS use "sshd"
+sshd_service_name: ssh
+
 ansible_ssh_key:
   - 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFtzcxdPSMZYg2jutiuS8Nvt/VzjY6t6kWZyJf7kjSAm drendov+ovh@gmail.com'
 
 custom_allowed_ports:
     - 50223
+    - 1222
     - 80
     - 443
+
+docker_enabled: false
+
+docker_packages:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg2
+    - software-properties-common
+    - docker-ce
+    - docker-compose-plugin
+
+intel_gpu_enabled: false
+
+intel_gpu_add_repo: true
+
+# Installed in stages to avoid apt version conflicts between Intel-repo packages.
+intel_gpu_packages_base:
+    - clinfo
+
+# Single Intel-repo transaction; apt resolves matching dependencies.
+intel_gpu_packages_intel:
+    - intel-level-zero-gpu
+
+# Tried one-by-one after the main stack; failures are reported and skipped.
+intel_gpu_packages_optional: []
+
+# Installed when the Intel-repo stack fails (e.g. libigc1 not available on older iGPUs).
+intel_gpu_packages_ubuntu_fallback:
+    - intel-opencl-icd
 
 packages:
     - screen
@@ -33,5 +67,3 @@ packages:
     - python3-venv
     - python3-dev
     - libssl-dev
-
-

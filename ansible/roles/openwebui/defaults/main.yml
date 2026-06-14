@@ -1,0 +1,19 @@
+---
+openwebui_image: ghcr.io/open-webui/open-webui:main
+openwebui_name: open-webui
+openwebui_port: 8080
+openwebui_data_dir: /var/lib/open-webui
+openwebui_ollama_base_url: http://127.0.0.1:11434
+
+openwebui_env:
+  OLLAMA_BASE_URL: "{{ openwebui_ollama_base_url }}"
+  WEBUI_AUTH: "true"
+  PORT: "{{ openwebui_port | string }}"
+
+openwebui_volumes:
+  - "{{ openwebui_data_dir }}:/app/backend/data"
+
+openwebui_log_driver: json-file
+openwebui_log_opt:
+  max-size: "10m"
+  max-file: "3"

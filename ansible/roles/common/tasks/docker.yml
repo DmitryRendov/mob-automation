@@ -1,6 +1,4 @@
 ---
-# Install docker hub
-
 - name: Get current Debian release name
   shell: lsb_release -cs
   register: debian_release
@@ -39,14 +37,20 @@
     filename: docker
   when: debian_release.stdout
 
-- name: Ensure APT+https, CA certificates are installed.
-  apt: pkg={{item}} state=present update_cache=yes
-  with_items:
-    - apt-transport-https
-    - ca-certificates
-    - curl
-    - gnupg2
-    - software-properties-common
-    - lxc
-    - docker-ce
-    - python3-docker
+- name: Install Docker CE and compose plugin
+  apt:
+    name: "{{ docker_packages }}"
+    state: present
+    update_cache: yes
+
+- name: Ensure Docker service is running
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add user to docker group
+  user:
+    name: "{{ user }}"
+    groups: docker
+    append: yes
