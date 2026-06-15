@@ -5,26 +5,64 @@
     line: 'bind-address = 127.0.0.1'
   notify: restart mariadb
 
-- name: Remove anonymous users
-  mysql_user:
-    name: ''
-    host_all: yes
-    state: absent
-    login_unix_socket: /var/run/mysqld/mysqld.sock
+- block:
+    - name: Remove anonymous users (socket auth)
+      mysql_user:
+        name: ''
+        host_all: yes
+        state: absent
+        login_unix_socket: /var/run/mysqld/mysqld.sock
 
-- name: Remove test database
-  mysql_db:
-    name: test
-    state: absent
-    login_unix_socket: /var/run/mysqld/mysqld.sock
+    - name: Remove test database (socket auth)
+      mysql_db:
+        name: test
+        state: absent
+        login_unix_socket: /var/run/mysqld/mysqld.sock
 
-- name: Disallow root login remotely
-  mysql_user:
-    name: root
-    host: "{{ item }}"
-    state: absent
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-  loop:
-    - '%'
-    - '::1'
-  ignore_errors: yes
+    - name: Disallow root login remotely (socket auth)
+      mysql_user:
+        name: root
+        host: "{{ item }}"
+        state: absent
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+      loop:
+        - '%'
+        - '::1'
+      ignore_errors: yes
+  rescue:
+    - name: Ensure mysql_root_password is available for fallback auth
+      assert:
+        that:
+          - mysql_root_password is defined
+          - mysql_root_password | length > 0
+        fail_msg: "mysql_root_password is required when socket auth is disabled for root"
+
+    - name: Remove anonymous users (password auth fallback)
+      mysql_user:
+        name: ''
+        host_all: yes
+        state: absent
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+
+    - name: Remove test database (password auth fallback)
+      mysql_db:
+        name: test
+        state: absent
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+
+    - name: Disallow root login remotely (password auth fallback)
+      mysql_user:
+        name: root
+        host: "{{ item }}"
+        state: absent
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      loop:
+        - '%'
+        - '::1'
+      ignore_errors: yes

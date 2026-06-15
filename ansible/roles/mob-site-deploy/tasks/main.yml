@@ -8,7 +8,8 @@
 - include: configure.yml
 
 - include: database.yml
-  when: env_type == "dev"
+
+- include: media.yml
 
 - include: frontend.yml
 

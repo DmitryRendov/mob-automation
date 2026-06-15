@@ -3,9 +3,30 @@
 
 - name: Creating virtual host file
   template: src=minecraft-of-by.conf.j2 dest=/etc/apache2/sites-available/{{ site_name }}.conf
+  notify:
+    - restart apache2
 
 - name: Update site path in application.wsgi
-  replace: dest="{{ site_path }}/public_html/etc/application.wsgi" regexp="(\/home\/dmitry\/vhosts\/dev\.minecraft\.of\.by)" replace="{{ site_path }}"
+  replace:
+    dest: "{{ site_path }}/public_html/etc/application.wsgi"
+    regexp: '/home/[^/]+/vhosts/minecraft\.of\.by'
+    replace: "{{ site_path }}"
+
+- name: Update Django settings with minecraft database credentials
+  replace:
+    dest: "{{ site_path }}/public_html/mob/mob/settings.py"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - regexp: "('NAME'\\s*:\\s*')[^']*(')"
+      replace: "\\1{{ site_db_name }}\\2"
+    - regexp: "('USER'\\s*:\\s*')[^']*(')"
+      replace: "\\1{{ site_db_user }}\\2"
+    - regexp: "('PASSWORD'\\s*:\\s*')[^']*(')"
+      replace: "\\1{{ site_db_password }}\\2"
+    - regexp: "('HOST'\\s*:\\s*')[^']*(')"
+      replace: "\\1{{ mobsite_db_host }}\\2"
+  no_log: yes
 
 - name: Enable Apache2 modules
   apache2_module: name={{ item }} state=present

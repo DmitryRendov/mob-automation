@@ -1,0 +1,32 @@
+################################################
+##          Provision Variables               ##
+################################################
+
+# Common variables
+
+site_user: drendov
+site_group: drendov
+site_home: /home/drendov
+
+site_name: "minecraft.of.by"
+vhosts: "{{ site_home }}/vhosts"
+
+# MOB site source
+site_path: "{{ vhosts }}/{{site_name}}"
+site_repo: "git@github.com:DmitryRendov/mob-site.git"
+site_release: HEAD
+# media Source s3://mob-server-backups/mob-site/mob_site_media.13-06-2026.tar.gz
+site_media: "mob-site/mob_site_media.13-06-2026.tar.gz"
+site_media_target: "{{ site_path }}/public_html/mob/media"
+
+# MOB site DB 
+site_db_name: mob_site
+site_db_user: mob_user
+# site_db_password is provided at runtime via local.vars.yml (-e "@local.vars.yml")
+site_db_password: ""
+mobsite_db_host: localhost
+# dump source s3://mob-server-backups/mob-site/mob_site.13-06-2026.tar.gz
+site_s3_bucket: "mob-server-backups"
+site_db_src: "mob-site/mob_site.13-06-2026.tar.gz"
+keep_mysql_dump: false
+keep_media_archive: false

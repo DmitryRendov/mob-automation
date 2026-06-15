@@ -1,7 +1,7 @@
 # MOB site deployment
 #
-# ansible-playbook -i ./inventory/dev mob-site-deploy.yml --extra-vars "env=mobsite-dev user=dmitry env_type=dev" -vv
-# ansible-playbook -i ./inventory/live mob-site-deploy.yml --extra-vars "env=mobsite user=drendov password=VeryTopSecret123 env_type=live" -vv
+# ansible-playbook -i ./inventory/dev mob-site-deploy.yml  -e "env=mobsite user=dmitry env_type=dev"  -e "@local.vars.yml" -vv
+# ansible-playbook -i ./inventory/live mob-site-deploy.yml -e "env=mobsite user=drendov env_type=live" -e "@local.vars.yml" -vv
 
 - hosts: "{{env}}"
   user: "{{user}}"
@@ -9,6 +9,9 @@
   become_method: sudo
   gather_facts: true
   max_fail_percentage: 0
+
+  vars_files:
+    - host_vars/mobsite
 
   roles:
     - mob-site-deploy

@@ -3,4 +3,7 @@
 allow_duplicates: false
 
 dependencies:
-  - nodejs
+  - role: nodejs
+  - role: mariadb
+    mariadb_create_minecraft_db: false
+    mariadb_create_site_db: true

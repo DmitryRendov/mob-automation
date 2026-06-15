@@ -1,8 +1,9 @@
 target_path: /tmp
-env_type: "dev"
+env_type: dev
+python_version: "3.12"
 site_folders:
   - { name: "public_html", mode: "775", user: "{{ site_user }}", group: "www-data" }
-  - { name: "logs", mode: "775", user: "root", group: "adm" }
+  - { name: "logs", mode: "775", user: "root", group: "root" }
   - { name: "backups", mode: "775", user: "{{ site_user }}", group: "{{ site_group }}" }
   - { name: "tmp", mode: "777", user: "{{ site_user }}", group: "{{ site_group }}" }
 

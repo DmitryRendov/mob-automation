@@ -1,29 +1,26 @@
 ---
 
-- name: Install grunt and bower globally
-  npm: name={{ item }} global=yes
-  with_items:
-    - bower
-    - grunt-cli
-
-- name: Downloading sources
+- name: Install frontend dependencies (npm)
   become: yes
   become_user: "{{ site_user }}"
   become_method: sudo
-  command: bower update
-  args:
-    chdir: "{{ site_path }}/public_html/mob/static/"
+  npm:
+    path: "{{ site_path }}/public_html/mob/static"
+    state: present
 
-- name: Install packages based on package.json
+- name: Ensure frontend local bin scripts are executable
   become: yes
   become_user: "{{ site_user }}"
   become_method: sudo
-  npm: path={{ site_path }}/public_html/mob/static state=present
+  shell: |
+    if [ -d "{{ site_path }}/public_html/mob/static/node_modules/.bin" ]; then
+      chmod 0755 "{{ site_path }}/public_html/mob/static/node_modules/.bin"/* || true
+    fi
 
-- name: Launch grunt processing
+- name: Build frontend assets with Vite
   become: yes
   become_user: "{{ site_user }}"
   become_method: sudo
-  command: grunt
+  command: npm run build
   args:
     chdir: "{{ site_path }}/public_html/mob/static/"

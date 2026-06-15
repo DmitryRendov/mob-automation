@@ -24,9 +24,10 @@
 
         RequestHeader set HTTP_HOST {{ site_name }}
 
-        # RewriteRule /robots.txt {{ vhosts }}/{{ site_name }}/robots.txt [L]
+        RewriteRule /robots.txt {{ vhosts }}/{{ site_name }}/public_html/mob/static/robots.txt [L]
+        RewriteRule /google56e220698a8467a2.html {{ vhosts }}/{{ site_name }}/public_html/mob/static/google56e220698a8467a2.html
         # RewriteRule /sitemap(.*) {{ vhosts }}/{{ site_name }}/sitemap$1 [L]
-        RewriteRule /about.html /home/dmitry/vhosts/minecraft.of.by/public_html/mob/static/about.html [L]
+        RewriteRule /about.html {{ vhosts }}/{{ site_name }}/public_html/mob/static/about.html [L]
 
         # serve static files using the /static/ format
         RewriteCond %{REQUEST_FILENAME} ^/static/(.*)
@@ -37,6 +38,9 @@
         RewriteCond %{REQUEST_FILENAME} ^/media/(.*)
         RewriteCond {{ vhosts }}/{{ site_name }}/public_html/mob/media/%1 -f
         RewriteRule ^/media/(.+)$ {{ vhosts }}/{{ site_name }}/public_html/mob/media/$1 [L]
+
+        # Move dynmap to a new place
+        RewriteRule /map/ /survival/ [R]
 
         # Force browsers to not cache non-static stuff client-side
         Header merge Cache-Control no-store
@@ -57,7 +61,7 @@
         # Force browsers to not cache non-static stuff client-side
         Header merge Cache-Control no-store
 
-        WSGIDaemonProcess {{ site_user }} user={{ site_user }} threads=2 processes=4 python-path={{ vhosts }}/{{ site_name }}/public_html:{{ vhosts }}/{{ site_name }}/python-bin/lib/python2.7/site-packages receive-buffer-size=87380 send-buffer-size=87380 deadlock-timeout=60 maximum-requests=1000 inactivity-timeout=3600
+        WSGIDaemonProcess {{ site_user }} user={{ site_user }} threads=2 processes=4 python-home={{ vhosts }}/{{ site_name }}/public_html/python-bin python-path={{ vhosts }}/{{ site_name }}/public_html receive-buffer-size=87380 send-buffer-size=87380 deadlock-timeout=60 maximum-requests=1000 inactivity-timeout=3600
         WSGIScriptAlias / {{ vhosts }}/{{ site_name }}/public_html/etc/application.wsgi
         WSGIProcessGroup {{ site_user }}
         WSGIPassAuthorization On
