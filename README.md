@@ -53,11 +53,8 @@ git:
   ssh_key_name: id_ed25519_mobdeploy
   ssh_key: |
     -----BEGIN OPENSSH PRIVATE KEY-----
-    b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-    QyNTUxOQAAACDUJLldvOJA4cyLTLnjIBywfFjGZHahw/QlhLF+UOKT6gAAAKCsWtoerFra
-    HgAAAAtzc2gtZWQyNTUxOQAAACDUJLldvOJA4cyLTLnjIBywfFjGZHahw/QlhLF+UOKT6g
-    AAAECQNRsxegpWCAspk7CqXZG1UUPsPrO5ljlA8LEZn96kI9QkuV284kDhzItMueMgHLB8
-    WMZkdqHD9CWEsX5Q4pPqAAAAGGRyZW5kb3YrZ2l0aHViQGdtYWlsLmNvbQECAwQF
+    b3B<REDACTRED>gtZW
+    ...
     -----END OPENSSH PRIVATE KEY-----
 
 server_version: 1.21.10
