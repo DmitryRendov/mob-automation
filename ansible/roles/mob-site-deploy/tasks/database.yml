@@ -4,6 +4,8 @@
   mysql_query:
     query: "SELECT COUNT(*) AS cnt FROM information_schema.tables WHERE table_schema = '{{ site_db_name }}'"
     login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
   register: site_db_tables
 
 - name: Determine whether the site database is empty
@@ -51,6 +53,8 @@
     state: import
     target: "{{ dump_files.files[0].path }}"
     login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
   when: site_db_is_empty
 
 - name: Remove the downloaded dump archive and extracted files

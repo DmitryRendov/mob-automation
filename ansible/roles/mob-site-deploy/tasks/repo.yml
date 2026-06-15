@@ -1,5 +1,52 @@
 ---
 
+- name: Ensure .ssh directory exists for site user
+  file:
+    path: "{{ site_home }}/.ssh"
+    state: directory
+    mode: '0700'
+    owner: "{{ site_user }}"
+    group: "{{ site_group }}"
+
+- name: Deploy SSH private key for site user
+  copy:
+    content: "{{ git.ssh_key }}"
+    dest: "{{ site_home }}/.ssh/{{ git.ssh_key_name }}"
+    mode: '0600'
+    owner: "{{ site_user }}"
+    group: "{{ site_group }}"
+  no_log: yes
+
+- name: Configure SSH to use the deployed key for GitHub
+  blockinfile:
+    path: "{{ site_home }}/.ssh/config"
+    create: yes
+    owner: "{{ site_user }}"
+    group: "{{ site_group }}"
+    mode: '0600'
+    block: |
+      Host github.com
+        HostName github.com
+        User git
+        IdentityFile {{ site_home }}/.ssh/{{ git.ssh_key_name }}
+        StrictHostKeyChecking accept-new
+
+- name: Ensure GitHub is in known_hosts for site user
+  shell: ssh-keyscan -H github.com >> {{ site_home }}/.ssh/known_hosts 2>/dev/null || true
+  become: yes
+  become_user: "{{ site_user }}"
+
+- name: Ensure Apache can traverse site parent directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ site_user }}"
+    group: "{{ site_group }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: "{{ site_home }}", mode: "0711" }
+    - { path: "{{ vhosts }}", mode: "0755" }
+
 - name: Create project folder
   file: path="{{site_path}}" state=directory mode=775 owner={{ site_user }} group={{ site_group }}
 
@@ -18,16 +65,34 @@
   command: find {{ site_path }}/public_html -exec chown {{ site_user }}:www-data {} \;
 
 - name: Ensure files are 0644
-  command: find {{ site_path }}/public_html -type f -exec chmod 0644 {} \;
+  command: find {{ site_path }}/public_html -path '*/node_modules/*' -prune -o -type f -exec chmod 0644 {} \;
 
-- name: Install specified python requirements in indicated (virtualenv), step 1
+- name: Clean python-bin virtualenv directory
+  file:
+    path: "{{ site_path }}/public_html/python-bin"
+    state: absent
+
+- name: Ensure virtualenv has pip
+  become: yes
+  become_user: "{{ site_user }}"
+  become_method: sudo
+  shell: |
+    python3 -m venv "{{ site_path }}/public_html/python-bin"
+    "{{ site_path }}/public_html/python-bin/bin/python" -m ensurepip --upgrade
+  args:
+    creates: "{{ site_path }}/public_html/python-bin/bin/pip"
+
+- name: Install base and production python requirements
   become: yes
   become_user: "{{ site_user }}"
   become_method: sudo
   pip:
-    requirements: "{{ site_path }}/public_html/requirements/production.txt"
+    requirements: "{{ site_path }}/public_html/requirements/{{ item }}"
     virtualenv: "{{ site_path }}/public_html/python-bin"
     virtualenv_command: python3 -m venv
+  loop:
+    - base.txt
+    - production.txt
 
 - name: Install dev dependencies, step 2
   become: yes

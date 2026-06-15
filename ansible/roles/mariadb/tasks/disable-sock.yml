@@ -7,10 +7,17 @@
     state: present
   notify: restart mariadb
 
-- name: Disable unix_socket authentication for root using ALTER USER
-  mysql_query:
-    query: "ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('{{ mysql_root_password }}')"
+- name: Disable unix_socket authentication for root
+  mysql_user:
+    name: root
+    host: localhost
+    plugin: mysql_native_password
+    password: "{{ mysql_root_password }}"
+    state: present
     login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    check_implicit_admin: true
   no_log: yes
 
 - name: Set root password
@@ -19,6 +26,8 @@
     password: "{{ mysql_root_password }}"
     host: localhost
     state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
     login_user: root
     login_password: "{{ mysql_root_password }}"
+    check_implicit_admin: true
   no_log: yes

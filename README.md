@@ -53,11 +53,7 @@ git:
   ssh_key_name: id_ed25519_mobdeploy
   ssh_key: |
     -----BEGIN OPENSSH PRIVATE KEY-----
-    b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-    QyNTUxOQAAACDUJLldvOJA4cyLTLnjIBywfFjGZHahw/QlhLF+UOKT6gAAAKCsWtoerFra
-    HgAAAAtzc2gtZWQyNTUxOQAAACDUJLldvOJA4cyLTLnjIBywfFjGZHahw/QlhLF+UOKT6g
-    AAAECQNRsxegpWCAspk7CqXZG1UUPsPrO5ljlA8LEZn96kI9QkuV284kDhzItMueMgHLB8
-    WMZkdqHD9CWEsX5Q4pPqAAAAGGRyZW5kb3YrZ2l0aHViQGdtYWlsLmNvbQECAwQF
+    <REDACTRED>
     -----END OPENSSH PRIVATE KEY-----
 
 server_version: 1.21.10
@@ -84,7 +80,7 @@ keep_dynmap_tiles: true
 
 In case of a new release deployment - you need to merge all the changes to [mob-server] repo and play the provision playbook with the following options:
 ```sh
-ansible-playbook -i ./inventory/live mob-server-provision.yml -e "user=minecraft env=mobserver-vps" -e "@local.vars.yml" -v
+ansible-playbook -i ./inventory/live mob-server-provision.yml --key-file ~/.ssh/id_ed25519_mobdeploy -e "user=minecraft env=mobserver-vps" -e "@local.vars.yml" -v
 ```
 
 You can skip downloading server sources and MySQL dump by adding the following options to the command:
@@ -104,9 +100,25 @@ ansible-playbook -i ./inventory/live mob-server-provision.yml -e "user=minecraft
 
 ### MOB site deployment
 
+Perform initial setup and dependencies
+```sh
+$ ansible-playbook -i ./inventory/live common.yml -e "user=drendov env=mobsite" -kK -v
+$ ansible-playbook -i ./inventory/live services.yml -e "user=drendov env=mobsite" -e "@local.vars.yml" -v
+```
+
+Add mob-site specific configs to local.vars.yml
+```sh
+...
+
+# MOB site
+site_db_password: "YOUR_WEBSITE_DB_PASS"
+site_db_src: "mob-site/mob_site.01-12-2026.tar.gz"
+site_media: "mob-site/mob_site_media.13-06-2026.tar.gz"
+```
+
 MOB site is a part of game server and located in this GitHub repo - [mob-site]
 ```sh
-$ ansible-playbook -i ./inventory/live mob-site-deploy.yml -e "user=minecraft env=mobsite-server" -v
+$ ansible-playbook -i ./inventory/live mob-site-deploy.yml --key-file ~/.ssh/id_ed25519_mobsitedeploy -e "user=drendov env=mobsite" -e "@local.vars.yml" -v
 ```
 
 ### Ollama + Open WebUI
