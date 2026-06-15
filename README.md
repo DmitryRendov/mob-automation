@@ -53,7 +53,8 @@ git:
   ssh_key_name: id_ed25519_mobdeploy
   ssh_key: |
     -----BEGIN OPENSSH PRIVATE KEY-----
-    <REDACTRED>
+    b3B<REDACTRED>gtZW
+    ...
     -----END OPENSSH PRIVATE KEY-----
 
 server_version: 1.21.10
