@@ -46,7 +46,6 @@ D2BACKUP[5]='survival/playerdata'
 D2BACKUP[6]='survival/stats'
 D2BACKUP[7]='survival/uid.dat'
 D2BACKUP[8]='survival_nether'
-#D2BACKUP[9]='survival_the_end'
 D2BACKUP[10]='plugins/Essentials/userdata/'
 D2BACKUP[11]='plugins/GriefPreventionData/Logs'
 D2BACKUP[12]='plugins/GriefPreventionData/ClaimData/'
@@ -154,18 +153,35 @@ mc_backup() {
 
    umask 077
    NOW=$(date "+%Y-%m-%d_%Hh%M")
-   BACKUP_FILE="$BACKUPPATH/${WORLD}_${NOW}.tar.gz"
-   BACKUP_FOLDER="$BACKUPPATH/${WORLD}_${NOW}"
+   MONTH=$(date "+%Y-%m")
+   DAY=$(date "+%d")
+   FILELIST="/tmp/backup_filelist_${NOW}.txt"
+   SNAR_DIR="$BACKUPPATH/.snar"
+   SNAR_FILE="$SNAR_DIR/${MONTH}.snar"
+
+   # Create SNAR directory if it doesn't exist
+   mkdir -p "$SNAR_DIR"
 
    echo ""
-   echo "Removing old backups..."
+   echo "Removing old backups (older than 14 days)..."
    echo ""
-   find "$BACKUPPATH" -name "*.gz" -mtime +14 -exec rm {} \;
+   find "$BACKUPPATH" -maxdepth 1 -name "${WORLD}_*.tar.gz" -mtime +14 -exec rm {} \;
 
-   echo ""
-   echo "Creating TEMP backup folder"
-   echo ""
-   mkdir "$BACKUP_FOLDER"
+   # Determine if this is a full or incremental backup
+   IS_FULL=0
+   if [ "$DAY" = "01" ]; then
+      IS_FULL=1
+      echo "First day of month - Creating FULL backup..."
+      # Clean up old SNAR file for new month
+      rm -f "$SNAR_FILE"
+   else
+      if [ ! -f "$SNAR_FILE" ]; then
+         IS_FULL=1
+         echo "No previous backup found this month - Creating FULL backup..."
+      else
+         echo "Creating INCREMENTAL backup..."
+      fi
+   fi
 
    echo ""
    echo "Backup of the server database..."
@@ -175,47 +191,41 @@ mc_backup() {
 {% raw %}
    echo ""
    echo "Backing up Survival world Safe zone..."
-   echo ""
-
-   mcaFolders[0]="survival/entities"
-   mcaFolders[1]="survival/poi"
-   mcaFolders[2]="survival/region"
-
-   for path in ${mcaFolders[*]}
-   do
-      echo "Folder ${path}"
-      found=0
+   {
+      # Generate file list for selective MCA backup
       for i in $(seq -61 9); do
          for j in $(seq -32 17); do
-            filename="${path}/r.$i.$j.mca"
-            if [ -f "${MCPATH}/${filename}" ] ; then
-               as_user "rsync -a --relative ${MCPATH}/./${filename} ${BACKUP_FOLDER}"
-               ((found=found+1))
-            fi
+            for mca_type in entities poi region; do
+               filename="survival/${mca_type}/r.$i.$j.mca"
+               [ -f "${MCPATH}/${filename}" ] && echo "$filename"
+            done
          done
       done
-      echo "${found} out of $(ls ${MCPATH}/${path} | wc -l)"
-   done
-   echo "Marked to backup ${#mca2backups[@]} files..."
+
+      # Add other folders
+      for object in ${D2BACKUP[*]}; do
+        echo "${object}"
+      done
+   } > "$FILELIST"
 
    echo ""
-   echo "Backing up the rest of data..."
-   echo ""
+   if [ $IS_FULL -eq 1 ]; then
+      BACKUP_FILE="$BACKUPPATH/${WORLD}_${NOW}_full.tar.gz"
+      echo "Creating FULL backup archive..."
+      as_user "tar -C \"$MCPATH\" --listed-incremental=\"$SNAR_FILE\" -zcvf \"$BACKUP_FILE\" -T \"$FILELIST\" > /dev/null 2>&1"
+   else
+      BACKUP_FILE="$BACKUPPATH/${WORLD}_${NOW}_incr.tar.gz"
+      echo "Creating INCREMENTAL backup archive..."
+      as_user "tar -C \"$MCPATH\" --listed-incremental=\"$SNAR_FILE\" -zcvf \"$BACKUP_FILE\" -T \"$FILELIST\" > /dev/null 2>&1"
+   fi
 
-   for object in ${D2BACKUP[*]}
-   do
-      echo ""
-      echo -n "Copying ${object}"
-      as_user "rsync -a --relative ${MCPATH}/./${object} ${BACKUP_FOLDER}"
-   done
+   chmod 0600 "${BACKUP_FILE}"
+   rm -f "$FILELIST"
 
    mc_saveon
 
-   echo ""
-   echo "Compressing backup..."
-   as_user "tar -zcvf ${BACKUP_FILE} ${BACKUP_FOLDER}"
-   chmod 0600 "${BACKUP_FILE}"
-   as_user "rm -rf ${BACKUP_FOLDER}"
+   echo "Backup complete: $(basename \"$BACKUP_FILE\")"
+   echo "Database dump: mob_server_${NOW}.dump.gz"
    echo "Done."
 }
 
